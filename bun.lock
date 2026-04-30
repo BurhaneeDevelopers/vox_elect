@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "vox_elect",
+      "name": "elora",
       "dependencies": {
         "@google/generative-ai": "^0.24.1",
         "@supabase/ssr": "^0.10.2",

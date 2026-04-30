@@ -12,7 +12,7 @@
 ```bash
 # 1. Clone and install
 git clone <repo-url>
-cd vox_elect
+cd elora
 npm install
 
 # 2. Configure environment
