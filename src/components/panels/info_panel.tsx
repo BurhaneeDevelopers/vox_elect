@@ -207,7 +207,7 @@ function PollingLocationsTab({ zip }: { zip: string | null }) {
   );
 }
 
-function AboutElaraTab() {
+function AboutEloraTab() {
   return (
     <div className="flex flex-col gap-3">
       {/* About */}
@@ -217,12 +217,12 @@ function AboutElaraTab() {
             <span className="font-serif text-white font-bold text-sm">E</span>
           </div>
           <div>
-            <p className="text-xs font-semibold text-[#2D5016]">Elara</p>
+            <p className="text-xs font-semibold text-[#2D5016]">Elora</p>
             <p className="text-[10px] text-[#57534e]">Civic Education Guide</p>
           </div>
         </div>
         <p className="text-xs text-[#57534e] leading-relaxed">
-          Elara is a neutral AI guide powered by Taheri Developers. She explains elections,
+          Elora is a neutral AI guide powered by Taheri Developers. She explains elections,
           voting processes, and civic topics without ever endorsing candidates or taking political
           positions.
         </p>
@@ -352,7 +352,7 @@ export function info_panel({ on_close }: info_panel_props) {
               <PollingLocationsTab zip={active_zip} />
             )}
 
-            {active_tab === 'about' && <AboutElaraTab />}
+            {active_tab === 'about' && <AboutEloraTab />}
           </motion.div>
         </AnimatePresence>
       </div>

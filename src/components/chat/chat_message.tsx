@@ -3,7 +3,7 @@
 /**
  * Individual chat message component.
  * User messages: gold-tinted bubbles, right-aligned.
- * Elara messages: white with green left-border, left-aligned.
+ * Elora messages: white with green left-border, left-aligned.
  */
 
 import { useState } from 'react';
@@ -52,7 +52,7 @@ export function ChatMessage({
       onMouseEnter={() => set_is_hovered(true)}
       onMouseLeave={() => set_is_hovered(false)}
       role="listitem"
-      aria-label={is_user ? 'Your message' : "Elara's response"}
+      aria-label={is_user ? 'Your message' : "Elora's response"}
     >
       {/* Avatar */}
       {!is_user && (
@@ -60,7 +60,7 @@ export function ChatMessage({
           className={cn(
             'flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center',
             'bg-[#2D5016] text-white shadow-sm',
-            is_streaming && 'elara_thinking'
+            is_streaming && 'Elora_thinking'
           )}
           aria-hidden="true"
         >
@@ -81,7 +81,7 @@ export function ChatMessage({
       <div className={cn('flex flex-col gap-2 max-w-[82%]', is_user ? 'items-end' : 'items-start')}>
         {/* Name label */}
         <span className={cn('text-xs font-medium', is_user ? 'text-[#a8872e]' : 'text-[#2D5016]')}>
-          {is_user ? 'You' : 'Elara'}
+          {is_user ? 'You' : 'Elora'}
         </span>
 
         {/* Message bubble */}
@@ -107,7 +107,7 @@ export function ChatMessage({
               {message.content}
             </p>
           ) : is_streaming && !message.content ? (
-            <div className="flex items-center gap-2 py-1 px-1" aria-label="Elara is working" role="status">
+            <div className="flex items-center gap-2 py-1 px-1" aria-label="Elora is working" role="status">
               <Loader2 className="w-4 h-4 text-[#2D5016] animate-spin" aria-hidden="true" />
               <span className="text-sm text-[#57534e] font-medium animate-pulse">
                 {ai_activity_status}

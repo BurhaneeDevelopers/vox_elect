@@ -16,7 +16,7 @@
   --color-border: #E7E0D0;
   --color-border-strong: #d4c9b4;
   --color-user-bubble: #FDF3D0;
-  --color-elara-bubble: #FFFFFF;
+  --color-Elora-bubble: #FFFFFF;
   --font-display: 'Playfair Display', Georgia, serif;
   --font-prose: 'Crimson Pro', Georgia, serif;
   --font-ui: 'DM Sans', system-ui, sans-serif;
@@ -79,12 +79,12 @@ body {
 .waveform_bar:nth-child(4) { animation-delay: 0.3s; }
 .waveform_bar:nth-child(5) { animation-delay: 0.4s; }
 
-@keyframes elara_pulse {
+@keyframes Elora_pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.4); }
   50% { box-shadow: 0 0 0 8px rgba(201, 168, 76, 0); }
 }
-.elara_thinking {
-  animation: elara_pulse 1.5s ease-in-out infinite;
+.Elora_thinking {
+  animation: Elora_pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse_ring {
@@ -124,16 +124,16 @@ body {
   to { transform: translateX(0); opacity: 1; }
 }
 
-/* ===== ELARA PROSE (markdown rendering) ===== */
-.elara_prose {
+/* ===== Elora PROSE (markdown rendering) ===== */
+.Elora_prose {
   font-family: var(--font-prose);
   font-size: 1.05rem;
   line-height: 1.78;
   color: var(--color-text);
 }
 
-.elara_prose h1,
-.elara_prose h2 {
+.Elora_prose h1,
+.Elora_prose h2 {
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 600;
@@ -144,7 +144,7 @@ body {
   border-bottom: 1px solid var(--color-border);
 }
 
-.elara_prose h3 {
+.Elora_prose h3 {
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 600;
@@ -153,34 +153,34 @@ body {
   margin-bottom: 0.375rem;
 }
 
-.elara_prose p { margin-bottom: 0.875rem; }
-.elara_prose p:last-child { margin-bottom: 0; }
+.Elora_prose p { margin-bottom: 0.875rem; }
+.Elora_prose p:last-child { margin-bottom: 0; }
 
-.elara_prose strong {
+.Elora_prose strong {
   font-weight: 600;
   color: var(--color-primary);
 }
 
-.elara_prose a {
+.Elora_prose a {
   color: var(--color-accent-dark);
   text-decoration: underline;
   text-underline-offset: 2px;
   transition: color var(--transition-fast);
 }
-.elara_prose a:hover { color: var(--color-accent); }
+.Elora_prose a:hover { color: var(--color-accent); }
 
-.elara_prose ul {
+.Elora_prose ul {
   list-style: none;
   padding: 0;
   margin: 0.25rem 0 0.875rem 0;
 }
-.elara_prose ul li {
+.Elora_prose ul li {
   display: flex;
   gap: 0.5rem;
   align-items: flex-start;
   margin-bottom: 0.4rem;
 }
-.elara_prose ul li::before {
+.Elora_prose ul li::before {
   content: "▸";
   color: var(--color-primary);
   font-size: 0.7rem;
@@ -188,13 +188,13 @@ body {
   margin-top: 0.38rem;
 }
 
-.elara_prose ol {
+.Elora_prose ol {
   counter-reset: step-counter;
   list-style: none;
   padding: 0;
   margin: 0.25rem 0 0.875rem 0;
 }
-.elara_prose ol li {
+.Elora_prose ol li {
   counter-increment: step-counter;
   display: flex;
   gap: 0.75rem;
@@ -202,15 +202,15 @@ body {
   margin-bottom: 0.6rem;
   animation: step_enter 320ms ease-out both;
 }
-.elara_prose ol li:nth-child(1) { animation-delay: 0ms; }
-.elara_prose ol li:nth-child(2) { animation-delay: 100ms; }
-.elara_prose ol li:nth-child(3) { animation-delay: 200ms; }
-.elara_prose ol li:nth-child(4) { animation-delay: 300ms; }
-.elara_prose ol li:nth-child(5) { animation-delay: 400ms; }
-.elara_prose ol li:nth-child(6) { animation-delay: 500ms; }
-.elara_prose ol li:nth-child(7) { animation-delay: 600ms; }
-.elara_prose ol li:nth-child(8) { animation-delay: 700ms; }
-.elara_prose ol li::before {
+.Elora_prose ol li:nth-child(1) { animation-delay: 0ms; }
+.Elora_prose ol li:nth-child(2) { animation-delay: 100ms; }
+.Elora_prose ol li:nth-child(3) { animation-delay: 200ms; }
+.Elora_prose ol li:nth-child(4) { animation-delay: 300ms; }
+.Elora_prose ol li:nth-child(5) { animation-delay: 400ms; }
+.Elora_prose ol li:nth-child(6) { animation-delay: 500ms; }
+.Elora_prose ol li:nth-child(7) { animation-delay: 600ms; }
+.Elora_prose ol li:nth-child(8) { animation-delay: 700ms; }
+.Elora_prose ol li::before {
   content: counter(step-counter);
   display: flex;
   align-items: center;
@@ -227,16 +227,16 @@ body {
   margin-top: 0.15rem;
 }
 
-.elara_prose blockquote {
+.Elora_prose blockquote {
   background: linear-gradient(135deg, rgba(201, 168, 76, 0.1), rgba(201, 168, 76, 0.04));
   border-left: 3px solid var(--color-accent);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   padding: 0.75rem 1rem;
   margin: 0.875rem 0;
 }
-.elara_prose blockquote p { margin: 0; font-size: 0.95rem; }
+.Elora_prose blockquote p { margin: 0; font-size: 0.95rem; }
 
-.elara_prose code {
+.Elora_prose code {
   background: rgba(45, 80, 22, 0.08);
   color: var(--color-primary);
   padding: 0.1rem 0.35rem;
@@ -245,13 +245,13 @@ body {
   font-size: 0.875em;
 }
 
-.elara_prose hr {
+.Elora_prose hr {
   border: none;
   border-top: 1px solid var(--color-border);
   margin: 1rem 0;
 }
 
-.elara_prose table {
+.Elora_prose table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
@@ -259,7 +259,7 @@ body {
   overflow: hidden;
   border-radius: var(--radius-md);
 }
-.elara_prose th {
+.Elora_prose th {
   background: var(--color-primary);
   color: white;
   font-family: var(--font-ui);
@@ -270,9 +270,9 @@ body {
   padding: 0.5rem 0.75rem;
   text-align: left;
 }
-.elara_prose td {
+.Elora_prose td {
   border-bottom: 1px solid var(--color-border);
   padding: 0.5rem 0.75rem;
 }
-.elara_prose tr:last-child td { border-bottom: none; }
-.elara_prose tr:nth-child(even) td { background: rgba(245, 240, 232, 0.5); }
+.Elora_prose tr:last-child td { border-bottom: none; }
+.Elora_prose tr:nth-child(even) td { background: rgba(245, 240, 232, 0.5); }

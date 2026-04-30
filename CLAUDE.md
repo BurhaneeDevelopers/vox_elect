@@ -35,7 +35,7 @@ src/
 ├── lib/
 │   ├── gemini_client.ts       ← Gemini 1.5 Pro streaming client
 │   ├── civic_api_client.ts    ← Google Civic API wrapper
-│   ├── prompt_loader.ts       ← Loads /prompts/elara_system_prompt.txt
+│   ├── prompt_loader.ts       ← Loads /prompts/Elora_system_prompt.txt
 │   ├── query_client_config.ts ← TanStack Query config
 │   └── utils.ts               ← cn(), generate_id(), sanitise_input(), etc.
 ├── stores/
@@ -45,15 +45,15 @@ src/
     ├── election_types.ts
     └── voice_types.ts
 prompts/
-└── elara_system_prompt.txt    ← Elara persona + rules (loaded at runtime)
+└── Elora_system_prompt.txt    ← Elora persona + rules (loaded at runtime)
 ```
 
 ## Key Constraints
 
-- AI must never take political positions — see prompts/elara_system_prompt.txt
+- AI must never take political positions — see prompts/Elora_system_prompt.txt
 - All election data must cite source — handled in system prompt
 - Voice feature degrades gracefully if browser unsupported (use_voice.ts checks support)
-- Gemini system prompt lives in /prompts/elara_system_prompt.txt — never hardcode
+- Gemini system prompt lives in /prompts/Elora_system_prompt.txt — never hardcode
 - API keys are server-side only — civic API calls go through /api/elections proxy
 - Rate limiting on /api/chat: 60 req/min per IP (in-memory; use Redis in production)
 

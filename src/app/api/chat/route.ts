@@ -93,7 +93,7 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
     const error_message = err instanceof Error ? err.message : 'Unknown error';
     console.error('[/api/chat] Error:', error_message);
     return NextResponse.json(
-      { error: 'Elara is temporarily unavailable. Please try again.' },
+      { error: 'Elora is temporarily unavailable. Please try again.' },
       { status: 500 }
     );
   }

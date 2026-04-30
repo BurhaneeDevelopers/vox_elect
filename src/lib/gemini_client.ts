@@ -5,7 +5,7 @@
 
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import type { gemini_chat_request } from '@/types/chat_types';
-import { read_elara_system_prompt } from './prompt_loader';
+import { read_Elora_system_prompt } from './prompt_loader';
 
 // Safety settings — balanced for civic education context
 const SAFETY_SETTINGS = [
@@ -51,7 +51,7 @@ function to_gemini_messages(
  */
 export async function stream_chat_response(request: gemini_chat_request): Promise<ReadableStream<string>> {
   const client = get_gemini_client();
-  const system_prompt = await read_elara_system_prompt();
+  const system_prompt = await read_Elora_system_prompt();
 
   // Build location context appendix if available
   let location_appendix = '';

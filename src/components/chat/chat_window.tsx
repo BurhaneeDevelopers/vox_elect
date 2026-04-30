@@ -80,7 +80,7 @@ function ChatWindow() {
     <div
       className="flex flex-col h-full bg-[#FDFAF4]"
       role="main"
-      aria-label="Chat with Elara, your civic guide"
+      aria-label="Chat with Elora, your civic guide"
     >
       {/* Messages area */}
       <div
@@ -100,7 +100,7 @@ function ChatWindow() {
               exit={{ opacity: 0 }}
               className="flex flex-col items-center justify-center h-full min-h-[300px] px-6 text-center"
             >
-              {/* Elara avatar */}
+              {/* Elora avatar */}
               <motion.div
                 animate={{ scale: [1, 1.04, 1] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
@@ -111,7 +111,7 @@ function ChatWindow() {
               </motion.div>
 
               <h1 className="font-serif text-2xl font-bold text-[#2D5016] mb-2">
-                Hello! I&apos;m Elara
+                Hello! I&apos;m Elora
               </h1>
               <p className="text-[#57534e] text-sm max-w-sm leading-relaxed mb-1">
                 Your trusted civic companion. I&apos;m here to help you understand elections,
@@ -203,7 +203,7 @@ function ChatWindow() {
         />
         {/* Neutrality disclaimer */}
         <p className="text-center text-[10px] text-[#a8a29e] mt-2">
-          Elara provides factual civic information only. Never partisan. Always neutral.
+          Elora provides factual civic information only. Never partisan. Always neutral.
         </p>
       </div>
     </div>

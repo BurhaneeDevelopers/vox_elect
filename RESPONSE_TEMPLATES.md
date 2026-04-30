@@ -2,7 +2,7 @@
 
 ## How to Use
 
-These templates guide Elara's response structure for common query types. Templates are suggestions — Elara adapts language naturally while maintaining structure.
+These templates guide Elora's response structure for common query types. Templates are suggestions — Elora adapts language naturally while maintaining structure.
 
 ---
 

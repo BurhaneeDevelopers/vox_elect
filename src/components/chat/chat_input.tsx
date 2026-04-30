@@ -160,11 +160,11 @@ export function chat_input({ on_send, is_loading, on_cancel }: chat_input_props)
           value={input_value}
           onChange={handle_input_change}
           onKeyDown={handle_key_down}
-          placeholder="Ask Elara about elections, voting, candidates…"
+          placeholder="Ask Elora about elections, voting, candidates…"
           rows={1}
           maxLength={MAX_INPUT_LENGTH}
           disabled={is_loading}
-          aria-label="Message to Elara"
+          aria-label="Message to Elora"
           aria-describedby="char_count"
           className="flex-1 resize-none bg-transparent outline-none text-sm text-[#1C1917] placeholder-[#a8a29e] leading-relaxed min-h-[24px] max-h-[140px] py-0.5 disabled:opacity-60"
         />

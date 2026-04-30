@@ -58,8 +58,8 @@ export function days_until(date_str: string): number {
 }
 
 /**
- * Extract suggested follow-up question from Elara's response.
- * Elara formats it as: **Suggested question:** [text]
+ * Extract suggested follow-up question from Elora's response.
+ * Elora formats it as: **Suggested question:** [text]
  */
 export function extract_suggested_question(content: string): string[] {
   const match = content.match(/\*\*Suggested question:\*\*\s*(.+?)(?:\n|$)/i);

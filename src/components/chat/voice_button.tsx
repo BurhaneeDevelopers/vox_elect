@@ -68,7 +68,7 @@ export function voice_button({ on_transcript, class_name }: voice_button_props) 
     if (!is_supported) return 'Voice input not supported in this browser';
     if (is_error) return 'Microphone permission denied';
     if (is_listening) return 'Listening — click or release to stop';
-    if (is_speaking) return 'Elara is speaking';
+    if (is_speaking) return 'Elora is speaking';
     return voice_mode === 'push_to_talk' ? 'Hold to speak' : 'Click to speak';
   };
 

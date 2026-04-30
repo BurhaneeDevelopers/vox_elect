@@ -12,7 +12,7 @@
 --color-text-muted: #6B7280;   /* muted gray — secondary text */
 --color-border: #E8E0D0;       /* warm light border */
 --color-user-bubble: #FDF3DC;  /* gold-tinted user messages */
---color-elara-border: #2D5016; /* green left-border on Elara messages */
+--color-Elora-border: #2D5016; /* green left-border on Elora messages */
 ```
 
 ### Typography
@@ -21,7 +21,7 @@
 font-family: 'Playfair Display', Georgia, serif;
 
 /* Body / UI */
-font-family: 'Crimson Pro', Georgia, serif;  /* for Elara's prose */
+font-family: 'Crimson Pro', Georgia, serif;  /* for Elora's prose */
 font-family: 'DM Sans', system-ui, sans-serif; /* for UI elements */
 ```
 
@@ -36,7 +36,7 @@ font-family: 'DM Sans', system-ui, sans-serif; /* for UI elements */
 - Alignment: right-aligned, max-width 75%
 - Shadow: subtle warm drop shadow
 
-### Elara Messages
+### Elora Messages
 - Background: `#FFFFFF`
 - Left border: 3px solid `--color-primary` (#2D5016)
 - Border-radius: 4px 18px 18px 18px
@@ -101,7 +101,7 @@ Rendered as: amber callout with countdown badge
 
 ## Suggested Follow-Up Chips
 
-Displayed below each Elara response:
+Displayed below each Elora response:
 - 3 chips max
 - Pill-shaped, forest green outline, forest green text
 - Hover: fills with forest green, text turns white

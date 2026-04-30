@@ -41,7 +41,7 @@ export default function LoginPage() {
             Welcome Back
           </h1>
           <p className="text-[#57534e] text-sm">
-            Sign in to continue your civic journey with Elara
+            Sign in to continue your civic journey with Elora
           </p>
         </div>
 

@@ -124,7 +124,7 @@ const markdown_components: Components = {
 
 export function response_renderer({ content, class_name }: response_renderer_props) {
   return (
-    <div className={cn('elara_prose', class_name)}>
+    <div className={cn('Elora_prose', class_name)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={markdown_components}

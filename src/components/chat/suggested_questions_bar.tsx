@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Renders Elara's suggested follow-up question chips below a response.
+ * Renders Elora's suggested follow-up question chips below a response.
  */
 
 import { motion } from 'framer-motion';

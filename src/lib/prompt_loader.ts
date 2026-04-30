@@ -1,5 +1,5 @@
 /**
- * Loads Elara's system prompt from /prompts/elara_system_prompt.txt at runtime.
+ * Loads Elora's system prompt from /prompts/Elora_system_prompt.txt at runtime.
  * Caches in memory to avoid repeated file reads. Never hardcodes the prompt.
  */
 
@@ -8,10 +8,10 @@ import path from 'path';
 
 let cached_prompt: string | null = null;
 
-export async function read_elara_system_prompt(): Promise<string> {
+export async function read_Elora_system_prompt(): Promise<string> {
   if (cached_prompt) return cached_prompt;
 
-  const prompt_path = path.join(process.cwd(), 'prompts', 'elara_system_prompt.txt');
+  const prompt_path = path.join(process.cwd(), 'prompts', 'Elora_system_prompt.txt');
   try {
     cached_prompt = await readFile(prompt_path, 'utf-8');
     return cached_prompt;
@@ -24,10 +24,10 @@ export async function read_elara_system_prompt(): Promise<string> {
 }
 
 function get_fallback_prompt(): string {
-  return `You are Elara, a warm and knowledgeable civic education guide for VoxElect.
+  return `You are Elora, a warm and knowledgeable civic education guide for VoxElect.
 
 IDENTITY:
-- Name: Elara
+- Name: Elora
 - Role: Civic education guide and election companion
 - Mission: Demystify elections, empower voters with accurate, non-partisan information
 

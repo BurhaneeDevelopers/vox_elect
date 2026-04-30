@@ -72,7 +72,7 @@ utterance.voice = voices.find(v => v.name.includes('Female')) ?? voices[0];
 ```
 
 ### TTS Behavior
-- Speaks Elara's responses automatically (configurable, default ON)
+- Speaks Elora's responses automatically (configurable, default ON)
 - User can mute TTS via speaker button in header
 - TTS pauses if user starts typing
 - Long responses split at paragraph boundaries for smoother playback
@@ -88,7 +88,7 @@ utterance.voice = voices.find(v => v.name.includes('Female')) ?? voices[0];
 - Duration: loops while listening
 
 ### Speaking Waveform
-- Radiating rings from Elara avatar
+- Radiating rings from Elora avatar
 - Color: `#C9A84C` (gold)
 - Scale: rings expand from 1.0 to 1.8, fade out
 - Duration: 1.2s loop while TTS playing
