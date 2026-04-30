@@ -13,6 +13,7 @@ import type { voice_state, voice_mode } from '@/types/voice_types';
 interface chat_store_state {
   session: chat_session;
   is_loading: boolean;
+  ai_activity_status: string;
   voice_state: voice_state;
   voice_mode: voice_mode;
   tts_enabled: boolean;
@@ -26,6 +27,7 @@ interface chat_store_state {
   complete_message: (id: string) => void;
   error_message: (id: string, error_text: string) => void;
   set_loading: (loading: boolean) => void;
+  set_ai_activity_status: (status: string) => void;
   set_voice_state: (state: voice_state) => void;
   set_voice_mode: (mode: voice_mode) => void;
   toggle_tts: () => void;
@@ -49,6 +51,7 @@ function create_new_session(): chat_session {
 export const use_chat_store = create<chat_store_state>((set, get) => ({
   session: create_new_session(),
   is_loading: false,
+  ai_activity_status: 'Thinking...',
   voice_state: 'idle',
   voice_mode: 'push_to_talk',
   tts_enabled: false,
@@ -148,6 +151,8 @@ export const use_chat_store = create<chat_store_state>((set, get) => ({
   },
 
   set_loading: (loading: boolean) => set({ is_loading: loading }),
+
+  set_ai_activity_status: (status: string) => set({ ai_activity_status: status }),
 
   set_voice_state: (state: voice_state) => set({ voice_state: state }),
 

@@ -9,6 +9,18 @@ import { use_chat_store } from '@/stores/chat_store';
 import { use_voice } from './use_voice';
 import { sanitise_input } from '@/lib/utils';
 
+// Dynamic status messages that cycle during AI processing
+const AI_STATUS_MESSAGES = [
+  'Analyzing your question...',
+  'Searching civic databases...',
+  'Gathering election information...',
+  'Verifying details...',
+  'Consulting voter resources...',
+  'Preparing response...',
+  'Cross-referencing data...',
+  'Reviewing election guidelines...',
+];
+
 export function use_chat() {
   const {
     session,
@@ -19,11 +31,31 @@ export function use_chat() {
     complete_message,
     error_message,
     set_loading,
+    set_ai_activity_status,
   } = use_chat_store();
 
   const abort_controller_ref = useRef<AbortController | null>(null);
+  const status_interval_ref = useRef<NodeJS.Timeout | null>(null);
 
   const { speak } = use_voice(() => {});
+
+  // Cycle through status messages
+  const start_status_cycling = useCallback(() => {
+    let index = 0;
+    set_ai_activity_status(AI_STATUS_MESSAGES[0]);
+    
+    status_interval_ref.current = setInterval(() => {
+      index = (index + 1) % AI_STATUS_MESSAGES.length;
+      set_ai_activity_status(AI_STATUS_MESSAGES[index]);
+    }, 2000); // Change status every 2 seconds
+  }, [set_ai_activity_status]);
+
+  const stop_status_cycling = useCallback(() => {
+    if (status_interval_ref.current) {
+      clearInterval(status_interval_ref.current);
+      status_interval_ref.current = null;
+    }
+  }, []);
 
   const send_message = useCallback(
     async (content: string) => {
@@ -37,6 +69,7 @@ export function use_chat() {
       add_user_message(trimmed);
       const assistant_id = start_assistant_message();
       set_loading(true);
+      start_status_cycling();
 
       // Build message history for the API (exclude streaming placeholder)
       const history = session.messages
@@ -81,13 +114,17 @@ export function use_chat() {
         // Speak the completed response if TTS is on
         if (full_text) speak(full_text);
       } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') return;
+        if (err instanceof Error && err.name === 'AbortError') {
+          stop_status_cycling();
+          return;
+        }
         const msg = err instanceof Error ? err.message : 'Something went wrong.';
         error_message(
           assistant_id,
           `I'm having trouble connecting right now. ${msg} Please try again in a moment.`
         );
       } finally {
+        stop_status_cycling();
         set_loading(false);
       }
     },
@@ -100,14 +137,18 @@ export function use_chat() {
       complete_message,
       error_message,
       set_loading,
+      set_ai_activity_status,
+      start_status_cycling,
+      stop_status_cycling,
       speak,
     ]
   );
 
   const cancel_stream = useCallback(() => {
     abort_controller_ref.current?.abort();
+    stop_status_cycling();
     set_loading(false);
-  }, [set_loading]);
+  }, [set_loading, stop_status_cycling]);
 
   return { send_message, cancel_stream, is_loading, messages: session.messages };
 }

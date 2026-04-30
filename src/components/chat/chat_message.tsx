@@ -7,11 +7,12 @@
  */
 
 import { motion } from 'framer-motion';
-import { AlertCircle, User } from 'lucide-react';
+import { AlertCircle, User, Loader2 } from 'lucide-react';
 import { response_renderer as ResponseRenderer } from './response_renderer';
 import { suggested_questions_bar as SuggestedQuestionsBar } from './suggested_questions_bar';
 import type { chat_message } from '@/types/chat_types';
 import { cn } from '@/lib/utils';
+import { use_chat_store } from '@/stores/chat_store';
 
 interface chat_message_props {
   message: chat_message;
@@ -19,13 +20,15 @@ interface chat_message_props {
   is_last?: boolean;
 }
 
-function typing_indicator() {
+function ai_activity_indicator() {
+  const { ai_activity_status } = use_chat_store();
+  
   return (
-    <div className="flex items-center gap-1 py-1 px-1" aria-label="Elara is typing" role="status">
-      <span className="sr-only">Elara is typing...</span>
-      <span className="typing_dot w-2 h-2 rounded-full bg-[#2D5016] opacity-60" aria-hidden="true" />
-      <span className="typing_dot w-2 h-2 rounded-full bg-[#2D5016] opacity-60" aria-hidden="true" />
-      <span className="typing_dot w-2 h-2 rounded-full bg-[#2D5016] opacity-60" aria-hidden="true" />
+    <div className="flex items-center gap-2 py-1 px-1" aria-label="Elara is working" role="status">
+      <Loader2 className="w-4 h-4 text-[#2D5016] animate-spin" aria-hidden="true" />
+      <span className="text-sm text-[#57534e] font-medium animate-pulse">
+        {ai_activity_status}
+      </span>
     </div>
   );
 }
@@ -105,7 +108,7 @@ export function chat_message_component({
               {message.content}
             </p>
           ) : is_streaming && !message.content ? (
-            typing_indicator()
+            ai_activity_indicator()
           ) : (
             <ResponseRenderer content={message.content} />
           )}
