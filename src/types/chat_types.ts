@@ -1,4 +1,4 @@
-// Chat and message types for VoxElect
+// Chat and message types for Elora
 
 export type message_role = 'user' | 'assistant' | 'system';
 

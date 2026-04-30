@@ -1,5 +1,5 @@
 -- ============================================================================
--- VoxElect Complete Database Setup
+-- Elora Complete Database Setup
 -- ============================================================================
 -- This file contains ALL migrations in the correct order
 -- Copy and paste this entire file into Supabase SQL Editor and run it

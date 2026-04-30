@@ -31,7 +31,7 @@ async function test_gemini() {
     console.log('✓ Client initialized\n');
 
     console.log('💬 Sending test message...');
-    const result = await model.generateContent('Say "Hello, VoxElect!" in one sentence.');
+    const result = await model.generateContent('Say "Hello, Elora!" in one sentence.');
     const response = result.response.text();
 
     console.log('✅ SUCCESS! Gemini API is working.\n');

@@ -1,4 +1,4 @@
-# VoxElect — Deployment Guide
+# Elora — Deployment Guide
 
 ## Prerequisites
 

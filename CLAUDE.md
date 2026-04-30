@@ -1,4 +1,4 @@
-# VoxElect — Project Context
+# Elora — Project Context
 
 Election education AI chatbot. Next.js 16 App Router. Gemini 1.5 Pro for AI.
 Civic Information API for voter data. Voice I/O via Web Speech API.

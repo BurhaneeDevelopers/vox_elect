@@ -1,5 +1,5 @@
 -- ============================================================================
--- VoxElect Chat History Table
+-- Elora Chat History Table
 -- ============================================================================
 -- This migration creates a chat_history table to store user conversations
 -- with Elora for analytics and conversation continuity.

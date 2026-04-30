@@ -1,4 +1,4 @@
-# VoxElect Formatting Guide
+# Elora Formatting Guide
 
 ## Design System
 

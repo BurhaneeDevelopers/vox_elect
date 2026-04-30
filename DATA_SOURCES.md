@@ -1,8 +1,8 @@
-# VoxElect Data Sources
+# Elora Data Sources
 
 ## Overview
 
-All election data in VoxElect is sourced from authoritative public APIs. This document catalogs each source, endpoint patterns, rate limits, and attribution requirements.
+All election data in Elora is sourced from authoritative public APIs. This document catalogs each source, endpoint patterns, rate limits, and attribution requirements.
 
 ---
 

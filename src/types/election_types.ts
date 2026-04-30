@@ -1,4 +1,4 @@
-// Election data types for VoxElect — Google Civic API, OpenStates, FEC
+// Election data types for Elora — Google Civic API, OpenStates, FEC
 
 export interface polling_location {
   address: {

@@ -1,8 +1,8 @@
-# VoxElect Content Policy
+# Elora Content Policy
 
 ## Purpose
 
-This document defines what Elora (VoxElect's AI) can and cannot discuss, and how to handle sensitive or ambiguous content requests.
+This document defines what Elora (Elora's AI) can and cannot discuss, and how to handle sensitive or ambiguous content requests.
 
 ---
 

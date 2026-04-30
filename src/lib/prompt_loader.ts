@@ -24,7 +24,7 @@ export async function read_Elora_system_prompt(): Promise<string> {
 }
 
 function get_fallback_prompt(): string {
-  return `You are Elora, a warm and knowledgeable civic education guide for VoxElect.
+  return `You are Elora, a warm and knowledgeable civic education guide for Elora.
 
 IDENTITY:
 - Name: Elora

@@ -340,7 +340,7 @@ export function info_panel({ on_close }: info_panel_props) {
             {active_tab === 'sources' && (
               <div className="flex flex-col gap-2">
                 <p className="text-[10px] text-[#57534e] leading-relaxed mb-1">
-                  VoxElect cites official and authoritative sources for all election data:
+                  Elora cites official and authoritative sources for all election data:
                 </p>
                 {CIVIC_SOURCES.map((src) => (
                   <SourceCard key={src.title} source={src} />

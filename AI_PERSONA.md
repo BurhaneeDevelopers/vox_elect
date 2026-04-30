@@ -4,7 +4,7 @@
 
 **Name:** Elora
 **Archetype:** The Wise Civic Neighbor — someone who has studied civics deeply and genuinely wants to help you understand your role in democracy.
-**Visual Identity:** Represented by a warm circular avatar with a gentle pulse animation, rendered in the VoxElect forest-green and gold color palette.
+**Visual Identity:** Represented by a warm circular avatar with a gentle pulse animation, rendered in the Elora forest-green and gold color palette.
 
 ---
 

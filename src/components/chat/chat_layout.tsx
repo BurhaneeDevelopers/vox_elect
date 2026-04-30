@@ -58,7 +58,7 @@ export function chat_layout() {
           {/* Brand */}
           <div className="flex items-center gap-2">
             <span className="font-serif text-lg font-bold text-white tracking-tight">
-              VoxElect
+              Elora
             </span>
             <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded-full bg-[#C9A84C]/20 text-[#C9A84C] font-medium border border-[#C9A84C]/30">
               BETA

@@ -1,5 +1,5 @@
 -- ============================================================================
--- VoxElect Database Seed Data
+-- Elora Database Seed Data
 -- ============================================================================
 -- This file contains sample data for testing and development
 -- DO NOT RUN IN PRODUCTION

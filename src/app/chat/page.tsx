@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * /chat — Main VoxElect chat interface.
+ * /chat — Main Elora chat interface.
  * Three-column layout: election calendar sidebar | chat | info panel.
  */
 
@@ -43,7 +43,7 @@ export default function ChatPage() {
               {sidebar_open ? <PanelLeftClose size={16} /> : <PanelLeftOpen size={16} />}
             </button>
 
-            {/* VoxElect wordmark */}
+            {/* Elora wordmark */}
             <div className="flex items-center gap-2 flex-1">
               <div
                 className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2D5016] to-[#3d6b1f] flex items-center justify-center shadow-sm flex-shrink-0"
@@ -52,7 +52,7 @@ export default function ChatPage() {
                 <span className="text-white font-serif font-bold text-xs select-none">V</span>
               </div>
               <div className="flex flex-col leading-tight">
-                <span className="font-serif font-bold text-[#2D5016] text-sm leading-none">VoxElect</span>
+                <span className="font-serif font-bold text-[#2D5016] text-sm leading-none">Elora</span>
                 <span className="text-[10px] text-[#57534e] leading-none">
                   Civic Guide — Powered by Taheri Developers
                 </span>

@@ -1,8 +1,8 @@
-# VoxElect Voice UX Specification
+# Elora Voice UX Specification
 
 ## Overview
 
-VoxElect supports voice input (speech-to-text) and voice output (text-to-speech) using browser-native APIs with graceful fallbacks. Voice features are progressive enhancements — the app works fully without them.
+Elora supports voice input (speech-to-text) and voice output (text-to-speech) using browser-native APIs with graceful fallbacks. Voice features are progressive enhancements — the app works fully without them.
 
 ---
 

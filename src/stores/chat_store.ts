@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Zustand store for VoxElect chat session state.
+ * Zustand store for Elora chat session state.
  * Manages messages, voice state, location context, and UI panels.
  */
 

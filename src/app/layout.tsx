@@ -3,7 +3,7 @@ import { providers as Providers } from '@/components/ui/providers';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'VoxElect — Your AI Election Guide',
+  title: 'Elora — Your AI Election Guide',
   description:
     'Meet Elora, your civic companion. Ask anything about elections, voting, candidates, and civic processes. Powered by Taheri Developers.',
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     'Taheri Developers',
   ],
   openGraph: {
-    title: 'VoxElect — Your AI Election Guide',
+    title: 'Elora — Your AI Election Guide',
     description:
       'Meet Elora, your civic companion. Ask anything about elections, voting, and civic processes.',
     type: 'website',

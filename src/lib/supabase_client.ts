@@ -1,5 +1,5 @@
 /**
- * Supabase client configuration for VoxElect
+ * Supabase client configuration for Elora
  * Browser-side client for authentication and database operations
  */
 

@@ -1,5 +1,5 @@
 /**
- * Authentication and user types for VoxElect
+ * Authentication and user types for Elora
  */
 
 export interface user_profile {

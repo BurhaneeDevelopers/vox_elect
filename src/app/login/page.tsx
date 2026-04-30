@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Login page for VoxElect
+ * Login page for Elora
  * Allows users to sign in with email and password
  */
 

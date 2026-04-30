@@ -1,5 +1,5 @@
 /**
- * Google Civic Information API client for VoxElect.
+ * Google Civic Information API client for Elora.
  * Proxied through /api/elections to keep API key server-side only.
  */
 

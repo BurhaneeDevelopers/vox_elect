@@ -1,5 +1,5 @@
 /**
- * General utility helpers for VoxElect.
+ * General utility helpers for Elora.
  */
 
 import { clsx, type ClassValue } from 'clsx';

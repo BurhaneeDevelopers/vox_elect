@@ -1,5 +1,5 @@
 /**
- * TanStack React Query v5 client configuration for VoxElect.
+ * TanStack React Query v5 client configuration for Elora.
  * Centralises caching, retry, and stale-time defaults.
  */
 

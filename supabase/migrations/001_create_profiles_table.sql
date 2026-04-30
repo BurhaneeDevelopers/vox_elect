@@ -1,5 +1,5 @@
 -- ============================================================================
--- VoxElect User Profiles Table
+-- Elora User Profiles Table
 -- ============================================================================
 -- This migration creates a profiles table to store additional user information
 -- and track registered users. It's linked to Supabase Auth's auth.users table.

@@ -1,4 +1,4 @@
-# VoxElect Response Templates
+# Elora Response Templates
 
 ## How to Use
 

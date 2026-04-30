@@ -1,4 +1,4 @@
-// Voice feature types for VoxElect
+// Voice feature types for Elora
 
 export type voice_state = 'idle' | 'listening' | 'processing' | 'speaking' | 'error';
 

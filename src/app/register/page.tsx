@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Registration page for VoxElect
+ * Registration page for Elora
  * Allows new users to create an account
  */
 
@@ -57,7 +57,7 @@ export default function RegisterPage() {
             <span className="text-3xl font-serif font-bold text-white">E</span>
           </motion.div>
           <h1 className="font-serif text-3xl font-bold text-[#2D5016] mb-2">
-            Join VoxElect
+            Join Elora
           </h1>
           <p className="text-[#57534e] text-sm">
             Create your account and start your civic education journey

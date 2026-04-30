@@ -1,5 +1,5 @@
 /**
- * Gemini 1.5 Pro client + streaming helper for VoxElect
+ * Gemini 1.5 Pro client + streaming helper for Elora
  * All Gemini interactions route through this module — never call the SDK directly from components.
  */
 
