@@ -36,6 +36,8 @@ interface chat_store_state {
   clear_location_context: () => void;
   send_suggested_question: (question: string) => void;
   reset_session: () => void;
+  update_message_content: (id: string, content: string) => void;
+  delete_messages_after: (id: string) => void;
 }
 
 function create_new_session(): chat_session {
@@ -189,6 +191,31 @@ export const use_chat_store = create<chat_store_state>((set, get) => ({
       is_loading: false,
       voice_state: 'idle',
       active_zip: null,
+    });
+  },
+
+  update_message_content: (id: string, content: string) => {
+    set((state) => ({
+      session: {
+        ...state.session,
+        messages: state.session.messages.map((m) =>
+          m.id === id ? { ...m, content } : m
+        ),
+      },
+    }));
+  },
+
+  delete_messages_after: (id: string) => {
+    set((state) => {
+      const index = state.session.messages.findIndex((m) => m.id === id);
+      if (index === -1) return state;
+      
+      return {
+        session: {
+          ...state.session,
+          messages: state.session.messages.slice(0, index + 1),
+        },
+      };
     });
   },
 }));

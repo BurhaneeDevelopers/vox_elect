@@ -9,15 +9,33 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PanelRightOpen, Vote } from 'lucide-react';
+import { PanelRightOpen, Vote, MessageSquare, Plus } from 'lucide-react';
 import { chat_window as ChatWindow } from './chat_window';
 import { election_calendar_sidebar as ElectionCalendarSidebar } from '@/components/sidebar/election_calendar_sidebar';
 import { info_panel as InfoPanel } from '@/components/panels/info_panel';
+import { chat_history_drawer as ChatHistoryDrawer } from './chat_history_drawer';
+import { UserMenu } from '@/components/auth/user_menu';
 import { cn } from '@/lib/utils';
 
 export function chat_layout() {
   const [sidebar_open, set_sidebar_open] = useState(true);
   const [info_panel_open, set_info_panel_open] = useState(false);
+  const [history_drawer_open, set_history_drawer_open] = useState(false);
+
+  const handle_new_chat = () => {
+    // TODO: Implement new chat logic
+    console.log('New chat clicked');
+  };
+
+  const handle_select_session = (session_id: string) => {
+    // TODO: Load session from DB
+    console.log('Load session:', session_id);
+  };
+
+  const handle_delete_session = (session_id: string) => {
+    // TODO: Delete session from DB
+    console.log('Delete session:', session_id);
+  };
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-[#F5F0E8]">
@@ -56,23 +74,65 @@ export function chat_layout() {
           <span className="font-medium text-[#C9A84C]">Civic API</span>
         </div>
 
-        {/* Info panel toggle */}
-        <button
-          onClick={() => set_info_panel_open(!info_panel_open)}
-          aria-label={info_panel_open ? 'Hide info panel' : 'Show sources and polling info'}
-          aria-expanded={info_panel_open}
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] focus-visible:ring-offset-1 focus-visible:ring-offset-[#2D5016]',
-            info_panel_open
-              ? 'bg-[#C9A84C] text-[#1C1917]'
-              : 'bg-white/10 text-white hover:bg-white/15'
-          )}
-        >
-          <PanelRightOpen size={14} aria-hidden="true" />
-          <span className="hidden sm:inline">Sources</span>
-        </button>
+        {/* Right actions */}
+        <div className="flex items-center gap-2">
+          {/* New chat button */}
+          <button
+            onClick={handle_new_chat}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+              'bg-white/10 text-white hover:bg-white/15',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] focus-visible:ring-offset-1 focus-visible:ring-offset-[#2D5016]'
+            )}
+            aria-label="Start new chat"
+          >
+            <Plus size={14} aria-hidden="true" />
+            <span className="hidden sm:inline">New Chat</span>
+          </button>
+
+          {/* Past chats button */}
+          <button
+            onClick={() => set_history_drawer_open(true)}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+              'bg-white/10 text-white hover:bg-white/15',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] focus-visible:ring-offset-1 focus-visible:ring-offset-[#2D5016]'
+            )}
+            aria-label="View past chats"
+          >
+            <MessageSquare size={14} aria-hidden="true" />
+            <span className="hidden sm:inline">Past Chats</span>
+          </button>
+
+          {/* User menu */}
+          <UserMenu />
+
+          {/* Info panel toggle */}
+          <button
+            onClick={() => set_info_panel_open(!info_panel_open)}
+            aria-label={info_panel_open ? 'Hide info panel' : 'Show sources and polling info'}
+            aria-expanded={info_panel_open}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] focus-visible:ring-offset-1 focus-visible:ring-offset-[#2D5016]',
+              info_panel_open
+                ? 'bg-[#C9A84C] text-[#1C1917]'
+                : 'bg-white/10 text-white hover:bg-white/15'
+            )}
+          >
+            <PanelRightOpen size={14} aria-hidden="true" />
+            <span className="hidden sm:inline">Sources</span>
+          </button>
+        </div>
       </header>
+
+      {/* Chat history drawer */}
+      <ChatHistoryDrawer
+        is_open={history_drawer_open}
+        on_close={() => set_history_drawer_open(false)}
+        on_select_session={handle_select_session}
+        on_delete_session={handle_delete_session}
+      />
 
       {/* Main content area */}
       <div className="flex-1 flex overflow-hidden">

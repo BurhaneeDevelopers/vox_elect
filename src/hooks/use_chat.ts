@@ -116,6 +116,7 @@ export function use_chat() {
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') {
           stop_status_cycling();
+          error_message(assistant_id, 'Response canceled by user.');
           return;
         }
         const msg = err instanceof Error ? err.message : 'Something went wrong.';
@@ -147,8 +148,9 @@ export function use_chat() {
   const cancel_stream = useCallback(() => {
     abort_controller_ref.current?.abort();
     stop_status_cycling();
+    set_ai_activity_status('');
     set_loading(false);
-  }, [set_loading, stop_status_cycling]);
+  }, [set_loading, stop_status_cycling, set_ai_activity_status]);
 
   return { send_message, cancel_stream, is_loading, messages: session.messages };
 }

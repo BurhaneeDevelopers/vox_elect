@@ -4,19 +4,21 @@
  * Main chat window — scrolling message list + input bar.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
-import { chat_message_component as ChatMessage } from './chat_message';
+import { ChatMessage } from './chat_message';
 import { chat_input as ChatInput } from './chat_input';
 import { use_chat } from '@/hooks/use_chat';
 import { use_chat_store } from '@/stores/chat_store';
 
 function ChatWindow() {
   const { send_message, cancel_stream, is_loading, messages } = use_chat();
-  use_chat_store();
+  const { update_message_content, delete_messages_after } = use_chat_store();
   const scroll_ref = useRef<HTMLDivElement>(null);
   const bottom_ref = useRef<HTMLDivElement>(null);
+  const [editing_message_id, set_editing_message_id] = useState<string | null>(null);
+  const [edit_content, set_edit_content] = useState('');
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -25,6 +27,51 @@ function ChatWindow() {
 
   const handle_suggested_question = (question: string) => {
     send_message(question);
+  };
+
+  const handle_edit_message = (message_id: string) => {
+    const message = messages.find((m) => m.id === message_id);
+    if (!message) return;
+    
+    set_editing_message_id(message_id);
+    set_edit_content(message.content);
+  };
+
+  const handle_save_edit = () => {
+    if (!editing_message_id || !edit_content.trim()) return;
+    
+    // Update message content
+    update_message_content(editing_message_id, edit_content.trim());
+    
+    // Delete all messages after edited one
+    delete_messages_after(editing_message_id);
+    
+    // Regenerate response
+    send_message(edit_content.trim());
+    
+    // Clear edit state
+    set_editing_message_id(null);
+    set_edit_content('');
+  };
+
+  const handle_cancel_edit = () => {
+    set_editing_message_id(null);
+    set_edit_content('');
+  };
+
+  const handle_rerun_message = (message_id: string) => {
+    const message = messages.find((m) => m.id === message_id);
+    if (!message || message.role !== 'user') return;
+    
+    // Delete all messages after this one
+    delete_messages_after(message_id);
+    
+    // Resend same message
+    send_message(message.content);
+  };
+
+  const handle_copy_message = async (content: string) => {
+    await navigator.clipboard.writeText(content);
   };
 
   const is_empty = messages.length === 0;
@@ -98,12 +145,46 @@ function ChatWindow() {
 
         {/* Messages */}
         {messages.map((message, index) => (
-          <ChatMessage
-            key={message.id}
-            message={message}
-            is_last={index === messages.length - 1}
-            on_suggested_question={handle_suggested_question}
-          />
+          <div key={message.id}>
+            {editing_message_id === message.id ? (
+              // Edit mode
+              <div className="px-4 py-2">
+                <div className="max-w-[82%] ml-auto">
+                  <textarea
+                    value={edit_content}
+                    onChange={(e) => set_edit_content(e.target.value)}
+                    className="w-full p-3 rounded-lg border border-[#C9A84C] focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
+                    rows={3}
+                    autoFocus
+                  />
+                  <div className="flex gap-2 mt-2 justify-end">
+                    <button
+                      onClick={handle_cancel_edit}
+                      className="px-3 py-1.5 text-sm rounded-lg border border-[#E7E0D0] hover:bg-[#F5F0E8] transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handle_save_edit}
+                      disabled={!edit_content.trim()}
+                      className="px-3 py-1.5 text-sm rounded-lg bg-[#2D5016] text-white hover:bg-[#3d6b1f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Save & Regenerate
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <ChatMessage
+                message={message}
+                is_last={index === messages.length - 1}
+                on_suggested_question={handle_suggested_question}
+                on_edit={handle_edit_message}
+                on_rerun={handle_rerun_message}
+                on_copy={handle_copy_message}
+              />
+            )}
+          </div>
         ))}
 
         <div ref={bottom_ref} aria-hidden="true" />

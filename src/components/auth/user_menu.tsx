@@ -21,21 +21,23 @@ export function UserMenu() {
       {/* Trigger Button */}
       <button
         onClick={() => set_is_open(!is_open)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#F5F0E8] transition-colors"
+        className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
+        aria-label="User menu"
+        aria-expanded={is_open}
       >
-        <div className="w-8 h-8 rounded-full bg-[#2D5016] flex items-center justify-center">
+        <div className="w-7 h-7 rounded-full bg-[#C9A84C] flex items-center justify-center">
           <User className="w-4 h-4 text-white" />
         </div>
-        <div className="hidden md:block text-left">
-          <p className="text-sm font-medium text-[#1C1917]">
+        <div className="hidden lg:block text-left">
+          <p className="text-xs font-medium text-white">
             {user.full_name || 'User'}
           </p>
-          <p className="text-xs text-[#78716c]">{user.email}</p>
         </div>
         <ChevronDown
-          className={`w-4 h-4 text-[#78716c] transition-transform ${
+          className={`w-3.5 h-3.5 text-white/60 transition-transform ${
             is_open ? 'rotate-180' : ''
           }`}
+          aria-hidden="true"
         />
       </button>
 

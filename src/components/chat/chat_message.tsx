@@ -6,10 +6,12 @@
  * Elara messages: white with green left-border, left-aligned.
  */
 
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, User, Loader2 } from 'lucide-react';
 import { response_renderer as ResponseRenderer } from './response_renderer';
 import { suggested_questions_bar as SuggestedQuestionsBar } from './suggested_questions_bar';
+import { message_actions as MessageActions } from './message_actions';
 import type { chat_message } from '@/types/chat_types';
 import { cn } from '@/lib/utils';
 import { use_chat_store } from '@/stores/chat_store';
@@ -18,40 +20,37 @@ interface chat_message_props {
   message: chat_message;
   on_suggested_question?: (q: string) => void;
   is_last?: boolean;
+  on_edit?: (message_id: string) => void;
+  on_rerun?: (message_id: string) => void;
+  on_copy?: (content: string) => void;
 }
 
-function ai_activity_indicator() {
-  const { ai_activity_status } = use_chat_store();
-  
-  return (
-    <div className="flex items-center gap-2 py-1 px-1" aria-label="Elara is working" role="status">
-      <Loader2 className="w-4 h-4 text-[#2D5016] animate-spin" aria-hidden="true" />
-      <span className="text-sm text-[#57534e] font-medium animate-pulse">
-        {ai_activity_status}
-      </span>
-    </div>
-  );
-}
-
-export function chat_message_component({
+export function ChatMessage({
   message,
   on_suggested_question,
   is_last = false,
+  on_edit,
+  on_rerun,
+  on_copy,
 }: chat_message_props) {
+  const [is_hovered, set_is_hovered] = useState(false);
+  const { ai_activity_status } = use_chat_store();
+  
   const is_user = message.role === 'user';
   const is_error = message.status === 'error';
   const is_streaming = message.status === 'streaming';
 
   return (
     <motion.div
-      layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className={cn(
-        'flex gap-3 px-4 py-1',
+        'flex gap-3 px-4 py-1 relative group',
         is_user ? 'flex-row-reverse' : 'flex-row'
       )}
+      onMouseEnter={() => set_is_hovered(true)}
+      onMouseLeave={() => set_is_hovered(false)}
       role="listitem"
       aria-label={is_user ? 'Your message' : "Elara's response"}
     >
@@ -99,7 +98,7 @@ export function chat_message_component({
           {is_error && (
             <div className="flex items-center gap-2 text-sm text-red-600 mb-1">
               <AlertCircle size={14} aria-hidden="true" />
-              <span className="font-medium">Connection issue</span>
+              <span className="font-medium">Oops..</span>
             </div>
           )}
 
@@ -108,11 +107,30 @@ export function chat_message_component({
               {message.content}
             </p>
           ) : is_streaming && !message.content ? (
-            ai_activity_indicator()
+            <div className="flex items-center gap-2 py-1 px-1" aria-label="Elara is working" role="status">
+              <Loader2 className="w-4 h-4 text-[#2D5016] animate-spin" aria-hidden="true" />
+              <span className="text-sm text-[#57534e] font-medium animate-pulse">
+                {ai_activity_status}
+              </span>
+            </div>
           ) : (
             <ResponseRenderer content={message.content} />
           )}
         </div>
+
+        {/* Hover actions - below bubble */}
+        <AnimatePresence>
+          {is_hovered && message.status === 'complete' && (
+            <MessageActions
+              message_id={message.id}
+              role={message.role}
+              content={message.content}
+              on_edit={on_edit}
+              on_rerun={on_rerun}
+              on_copy={on_copy}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Suggested follow-up questions */}
         {is_last &&

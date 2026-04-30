@@ -12,6 +12,9 @@ export interface chat_message {
   status: message_status;
   suggested_questions?: string[];
   sources?: source_citation[];
+  parent_message_id?: string | null;
+  branch_path?: string[];
+  is_active?: boolean;
 }
 
 export interface source_citation {
@@ -34,6 +37,8 @@ export interface chat_session {
   location_context: user_location_context | null;
   created_at: Date;
   last_activity: Date;
+  title?: string;
+  user_id?: string;
 }
 
 export interface gemini_chat_request {
