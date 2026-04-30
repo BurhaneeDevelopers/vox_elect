@@ -72,7 +72,7 @@ function ChatWindow() {
               </p>
               <div className="flex items-center gap-1.5 text-xs text-[#C9A84C] font-medium mt-2">
                 <Sparkles size={13} aria-hidden="true" />
-                <span>Powered by Google Gemini 1.5 Pro</span>
+                <span>Powered by <a href="https://wa.me/+919003078610" target='_blank' rel='noopener'>Taheri Developers</a></span>
               </div>
 
               {/* Feature badges */}

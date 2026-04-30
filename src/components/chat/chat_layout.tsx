@@ -51,7 +51,7 @@ export function chat_layout() {
         {/* Center subtitle */}
         <div className="hidden md:flex items-center gap-1.5 text-white/60 text-xs">
           <span>Powered by</span>
-          <span className="font-medium text-[#C9A84C]">Google Gemini 1.5 Pro</span>
+          <span className="font-medium text-[#C9A84C]">Taheri Developers</span>
           <span>&amp;</span>
           <span className="font-medium text-[#C9A84C]">Civic API</span>
         </div>

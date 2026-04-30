@@ -222,7 +222,7 @@ function AboutElaraTab() {
           </div>
         </div>
         <p className="text-xs text-[#57534e] leading-relaxed">
-          Elara is a neutral AI guide powered by Google Gemini 1.5 Pro. She explains elections,
+          Elara is a neutral AI guide powered by Taheri Developers. She explains elections,
           voting processes, and civic topics without ever endorsing candidates or taking political
           positions.
         </p>
@@ -248,12 +248,12 @@ function AboutElaraTab() {
       {/* Powered by */}
       <div className="rounded-xl border border-[#E7E0D0] p-2.5 mt-1">
         <p className="text-[10px] text-[#57534e] font-medium uppercase tracking-wide mb-1.5">
-          Powered by Google
+          Powered by 
         </p>
         {[
-          'Gemini 1.5 Pro (AI)',
+          'Taheri Developers',
+          'Gemini 3.1 Lite (AI)',
           'Civic Information API (voter data)',
-          'Google Fonts (typography)',
         ].map((item) => (
           <div key={item} className="flex items-center gap-1.5 py-0.5">
             <ChevronRight size={10} className="text-[#C9A84C]" aria-hidden="true" />
