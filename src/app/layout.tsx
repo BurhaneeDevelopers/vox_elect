@@ -3,9 +3,9 @@ import { providers as Providers } from '@/components/ui/providers';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Elora — Your AI Election Guide',
+  title: 'Elora — AI Election Guide | Non-Partisan Voting Information',
   description:
-    'Meet Elora, your civic companion. Ask anything about elections, voting, candidates, and civic processes. Powered by Taheri Developers.',
+    'Meet Elora, your AI-powered civic companion. Get accurate, non-partisan information about elections, voting processes, candidates, and civic education. Powered by Google Gemini.',
   keywords: [
     'elections',
     'voting',
@@ -14,14 +14,58 @@ export const metadata: Metadata = {
     'election guide',
     'AI chatbot',
     'Google Gemini',
-    'Taheri Developers',
+    'non-partisan',
+    'voter information',
+    'polling places',
+    'ballot information',
+    'election calendar',
+    'civic engagement',
+    'democracy',
+    'voting rights',
   ],
-  openGraph: {
-    title: 'Elora — Your AI Election Guide',
-    description:
-      'Meet Elora, your civic companion. Ask anything about elections, voting, and civic processes.',
-    type: 'website',
+  authors: [{ name: 'Taheri Developers' }],
+  creator: 'Taheri Developers',
+  publisher: 'Taheri Developers',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://elora.app',
+    siteName: 'Elora',
+    title: 'Elora — AI Election Guide | Non-Partisan Voting Information',
+    description:
+      'Get accurate, non-partisan information about elections, voting, and civic processes. AI-powered civic education chatbot with location-based personalization.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Elora — Your AI Election Guide',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Elora — AI Election Guide',
+    description:
+      'Get accurate, non-partisan information about elections, voting, and civic processes.',
+    images: ['/og-image.png'],
+    creator: '@elora_app',
+  },
+  alternates: {
+    canonical: 'https://elora.app',
+  },
+  category: 'Civic Education',
 };
 
 export default function root_layout({
