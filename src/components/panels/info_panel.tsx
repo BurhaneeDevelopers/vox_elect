@@ -28,10 +28,22 @@ interface info_tab {
 
 const CIVIC_SOURCES = [
   {
-    title: 'Google Civic Information API',
-    description: 'Polling locations, voter registration, elected officials',
-    url: 'https://developers.google.com/civic-information',
-    domain: 'Google',
+    title: 'CivicAPI.org',
+    description: 'Free election data API — upcoming elections, dates, results',
+    url: 'https://civicapi.org',
+    domain: 'CivicAPI.org',
+  },
+  {
+    title: 'Tavily Search API',
+    description: 'Real-time web search for live civic information',
+    url: 'https://tavily.com',
+    domain: 'Tavily',
+  },
+  {
+    title: 'OpenStates',
+    description: 'State legislature, representatives, and bill tracking',
+    url: 'https://openstates.org',
+    domain: 'OpenStates',
   },
   {
     title: 'Vote.gov',
@@ -46,10 +58,10 @@ const CIVIC_SOURCES = [
     domain: 'Ballotpedia',
   },
   {
-    title: 'OpenStates',
-    description: 'State legislature and bill tracking',
-    url: 'https://openstates.org',
-    domain: 'OpenStates',
+    title: 'Google Civic Information API',
+    description: 'Polling locations, voter registration (fallback)',
+    url: 'https://developers.google.com/civic-information',
+    domain: 'Google',
   },
   {
     title: 'Federal Election Commission',
@@ -252,8 +264,10 @@ function AboutEloraTab() {
         </p>
         {[
           'Taheri Developers',
-          'Gemini 3.1 Lite (AI)',
-          'Civic Information API (voter data)',
+          'Gemini 3.1 Flash Lite (AI)',
+          'CivicAPI.org (elections)',
+          'OpenStates (representatives)',
+          'Tavily (web search)',
         ].map((item) => (
           <div key={item} className="flex items-center gap-1.5 py-0.5">
             <ChevronRight size={10} className="text-[#C9A84C]" aria-hidden="true" />

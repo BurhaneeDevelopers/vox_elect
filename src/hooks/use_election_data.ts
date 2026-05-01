@@ -43,6 +43,21 @@ export function use_election_calendar() {
   });
 }
 
+/** Fetch live elections from civicAPI.org */
+export function use_live_elections(zip?: string, state?: string) {
+  return useQuery({
+    queryKey: ['live_elections', zip, state],
+    queryFn: () =>
+      fetch_election_data({
+        action: 'elections',
+        ...(zip ? { zip } : {}),
+        ...(state ? { state } : {}),
+      }),
+    enabled: Boolean(zip || state),
+    staleTime: 60 * 60 * 1000, // 1 hour
+  });
+}
+
 /** Fetch state-specific voting deadlines */
 export function use_state_deadlines(state_code: string | null) {
   return useQuery<election_deadline[], Error>({
