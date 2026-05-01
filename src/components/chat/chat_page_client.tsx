@@ -21,7 +21,10 @@ import { use_chat_store } from '@/stores/chat_store';
 const query_client = create_query_client();
 
 export function ChatPageClient() {
-  const [sidebar_open, set_sidebar_open] = useState(true);
+  // Mobile detection for initial state
+  const is_mobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  
+  const [sidebar_open, set_sidebar_open] = useState(!is_mobile);
   const [info_panel_open, set_info_panel_open] = useState(false);
   
   const { location } = useLocation();
@@ -56,6 +59,8 @@ export function ChatPageClient() {
             sidebar={<ElectionCalendarSidebar />}
             chat={<ChatWindow />}
             info_panel={<InfoPanel on_close={() => set_info_panel_open(false)} />}
+            on_sidebar_close={() => set_sidebar_open(false)}
+            on_info_panel_close={() => set_info_panel_open(false)}
           />
         </div>
       </AuthGuard>

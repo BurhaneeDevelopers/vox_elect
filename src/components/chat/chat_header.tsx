@@ -37,16 +37,16 @@ export function ChatHeader({
       </button>
 
       {/* Elora wordmark */}
-      <div className="flex items-center gap-2 flex-1">
+      <div className="flex items-center gap-2 flex-1 min-w-0">
         <div
           className="w-7 h-7 rounded-full bg-linear-to-br from-[#2D5016] to-[#3d6b1f] flex items-center justify-center shadow-sm shrink-0"
           aria-hidden="true"
         >
           <span className="text-white font-serif font-bold text-xs select-none">V</span>
         </div>
-        <div className="flex flex-col leading-tight">
+        <div className="flex flex-col leading-tight min-w-0">
           <span className="font-serif font-bold text-[#2D5016] text-sm leading-none">Elora</span>
-          <span className="text-[10px] text-[#57534e] leading-none">
+          <span className="text-[10px] text-[#57534e] leading-none hidden sm:block truncate">
             Civic Guide — Powered by Taheri Developers
           </span>
         </div>
