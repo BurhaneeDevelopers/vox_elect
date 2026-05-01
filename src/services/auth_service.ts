@@ -119,3 +119,26 @@ export async function is_authenticated(): Promise<boolean> {
   const session = await get_current_session();
   return session !== null;
 }
+
+/**
+ * Sign in anonymously
+ */
+export async function sign_in_anonymously(): Promise<user_profile> {
+  const { data, error } = await supabase_client.auth.signInAnonymously();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data.user) {
+    throw new Error('Anonymous sign-in failed - no user returned');
+  }
+
+  return {
+    id: data.user.id,
+    email: data.user.email || 'anonymous',
+    full_name: 'Anonymous User',
+    created_at: data.user.created_at,
+    updated_at: data.user.updated_at || data.user.created_at,
+  };
+}

@@ -6,7 +6,7 @@
 
 import { useState, FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { UserPlus, Mail, Lock, User, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, AlertCircle, Loader2, CheckCircle, UserX } from 'lucide-react';
 import Link from 'next/link';
 import { use_auth } from '@/hooks/use_auth';
 
@@ -17,7 +17,7 @@ export function RegisterForm() {
   const [confirm_password, set_confirm_password] = useState('');
   const [validation_error, set_validation_error] = useState<string | null>(null);
 
-  const { register, is_registering, register_error } = use_auth();
+  const { register, sign_in_anonymously, is_registering, is_signing_in_anonymously, register_error, anonymous_signin_error } = use_auth();
 
   const handle_submit = (e: FormEvent) => {
     e.preventDefault();
@@ -36,8 +36,12 @@ export function RegisterForm() {
     register({ email, password, full_name });
   };
 
+  const handle_anonymous_signin = () => {
+    sign_in_anonymously();
+  };
+
   const error_message =
-    validation_error || (register_error instanceof Error ? register_error.message : null);
+    validation_error || (register_error instanceof Error ? register_error.message : null) || (anonymous_signin_error instanceof Error ? anonymous_signin_error.message : null);
 
   return (
     <motion.div
@@ -75,7 +79,7 @@ export function RegisterForm() {
               value={full_name}
               onChange={(e) => set_full_name(e.target.value)}
               required
-              disabled={is_registering}
+              disabled={is_registering || is_signing_in_anonymously}
               className="w-full pl-11 pr-4 py-3 border border-[#E7E0D0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5016] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="John Doe"
             />
@@ -95,7 +99,7 @@ export function RegisterForm() {
               value={email}
               onChange={(e) => set_email(e.target.value)}
               required
-              disabled={is_registering}
+              disabled={is_registering || is_signing_in_anonymously}
               className="w-full pl-11 pr-4 py-3 border border-[#E7E0D0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5016] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="you@example.com"
             />
@@ -115,7 +119,7 @@ export function RegisterForm() {
               value={password}
               onChange={(e) => set_password(e.target.value)}
               required
-              disabled={is_registering}
+              disabled={is_registering || is_signing_in_anonymously}
               className="w-full pl-11 pr-4 py-3 border border-[#E7E0D0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5016] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="••••••••"
               minLength={6}
@@ -140,7 +144,7 @@ export function RegisterForm() {
               value={confirm_password}
               onChange={(e) => set_confirm_password(e.target.value)}
               required
-              disabled={is_registering}
+              disabled={is_registering || is_signing_in_anonymously}
               className="w-full pl-11 pr-4 py-3 border border-[#E7E0D0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5016] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="••••••••"
             />
@@ -153,7 +157,7 @@ export function RegisterForm() {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={is_registering}
+          disabled={is_registering || is_signing_in_anonymously}
           className="w-full bg-[#2D5016] text-white py-3 rounded-lg font-medium hover:bg-[#3d6b1f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {is_registering ? (
@@ -169,6 +173,36 @@ export function RegisterForm() {
           )}
         </button>
       </form>
+
+      {/* Divider */}
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-[#E7E0D0]"></div>
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-2 bg-white text-[#78716c]">or</span>
+        </div>
+      </div>
+
+      {/* Anonymous Sign-in Button */}
+      <button
+        type="button"
+        onClick={handle_anonymous_signin}
+        disabled={is_registering || is_signing_in_anonymously}
+        className="w-full bg-[#78716c] text-white py-3 rounded-lg font-medium hover:bg-[#57534e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {is_signing_in_anonymously ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span>Entering...</span>
+          </>
+        ) : (
+          <>
+            <UserX className="w-5 h-5" />
+            <span>Explore Anonymously</span>
+          </>
+        )}
+      </button>
 
       {/* Login Link */}
       <div className="mt-6 text-center">

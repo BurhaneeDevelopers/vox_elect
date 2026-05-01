@@ -13,6 +13,7 @@ import {
   login_user,
   logout_user,
   register_user,
+  sign_in_anonymously,
 } from '@/services/auth_service';
 import { supabase_client } from '@/lib/supabase_client';
 import type { auth_credentials, registration_data, user_profile } from '@/types/auth_types';
@@ -86,6 +87,24 @@ export function use_logout() {
 }
 
 /**
+ * Hook for anonymous sign-in
+ */
+export function use_anonymous_signin() {
+  const query_client = useQueryClient();
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: sign_in_anonymously,
+    onSuccess: (user: user_profile) => {
+      // Update cache with anonymous user data
+      query_client.setQueryData(AUTH_QUERY_KEY, user);
+      // Redirect to chat
+      router.push('/chat');
+    },
+  });
+}
+
+/**
  * Hook to listen to auth state changes
  */
 export function use_auth_listener() {
@@ -125,6 +144,7 @@ export function use_auth() {
   const login_mutation = use_login();
   const register_mutation = use_register();
   const logout_mutation = use_logout();
+  const anonymous_signin_mutation = use_anonymous_signin();
 
   // Listen to auth state changes
   use_auth_listener();
@@ -137,10 +157,13 @@ export function use_auth() {
     login: login_mutation.mutate,
     register: register_mutation.mutate,
     logout: logout_mutation.mutate,
+    sign_in_anonymously: anonymous_signin_mutation.mutate,
     is_logging_in: login_mutation.isPending,
     is_registering: register_mutation.isPending,
     is_logging_out: logout_mutation.isPending,
+    is_signing_in_anonymously: anonymous_signin_mutation.isPending,
     login_error: login_mutation.error,
     register_error: register_mutation.error,
+    anonymous_signin_error: anonymous_signin_mutation.error,
   };
 }
