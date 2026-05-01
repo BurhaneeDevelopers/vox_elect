@@ -38,7 +38,7 @@ export function DonateButton() {
     try {
       const response = await open_razorpay_checkout(
         final_amount * 100, // Convert to paise
-        user?.user_metadata?.full_name,
+        user?.full_name || undefined,
         user?.email
       );
 
