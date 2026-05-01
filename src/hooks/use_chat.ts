@@ -21,7 +21,7 @@ const AI_STATUS_MESSAGES = [
   'Reviewing election guidelines...',
 ];
 
-export function use_chat() {
+export function useChat() {
   const {
     session,
     is_loading,
@@ -138,7 +138,6 @@ export function use_chat() {
       complete_message,
       error_message,
       set_loading,
-      set_ai_activity_status,
       start_status_cycling,
       stop_status_cycling,
       speak,

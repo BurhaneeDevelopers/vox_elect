@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { chat_window as ChatWindow } from '@/components/chat/chat_window_v2';
+import { chat_window as ChatWindow } from '@/components/chat/chat_window';
 import { election_calendar_sidebar as ElectionCalendarSidebar } from '@/components/sidebar/election_calendar_sidebar';
 import { info_panel as InfoPanel } from '@/components/panels/info_panel';
 import { AuthGuard } from '@/components/auth/auth_guard';

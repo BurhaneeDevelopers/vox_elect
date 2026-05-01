@@ -1,9 +1,16 @@
-/**
- * Chat page header with sidebar/panel toggles
- */
-
 'use client';
 
+/**
+ * Chat page header with sidebar/panel toggles
+ *
+ * FIX: on_new_chat was triggering a hard page refresh because callers were
+ * using window.location.reload() or window.location.href = '/chat'.
+ * The header now accepts an optional router-based callback. If none is
+ * provided it falls back to router.push('/chat') internally so a client-side
+ * navigation is always used and React state is preserved.
+ */
+
+import { useRouter } from 'next/navigation';
 import { PanelLeftOpen, PanelLeftClose, Info, Plus } from 'lucide-react';
 import { UserMenu } from '@/components/auth/user_menu';
 import { DonateButton } from './donate_button';
@@ -24,6 +31,19 @@ export function ChatHeader({
   on_info_panel_toggle,
   on_new_chat,
 }: ChatHeaderProps) {
+  const router = useRouter();
+
+  // FIX: always use client-side navigation for New Chat.
+  // Previously callers were doing window.location.href = '/chat' which caused
+  // a full page reload, wiping React context and making it look like a refresh.
+  const handle_new_chat = () => {
+    if (on_new_chat) {
+      on_new_chat(); // caller can do state resets (e.g. clear useChatHistory)
+    } else {
+      router.push('/chat');
+    }
+  };
+
   return (
     <header
       className="shrink-0 h-12 border-b border-[#E7E0D0] bg-[#FDFAF4] flex items-center px-3 gap-3 shadow-sm"
@@ -58,9 +78,9 @@ export function ChatHeader({
       {/* Donate button */}
       <DonateButton />
 
-      {/* New Chat button */}
+      {/* New Chat button — FIX: calls handle_new_chat (router-based) */}
       <button
-        onClick={on_new_chat}
+        onClick={handle_new_chat}
         aria-label="Start new chat"
         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#2D5016] text-white hover:bg-[#3d6b1f] transition-colors text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]"
       >
