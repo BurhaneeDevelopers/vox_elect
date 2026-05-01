@@ -6,6 +6,7 @@
 
 import { PanelLeftOpen, PanelLeftClose, Info, Plus } from 'lucide-react';
 import { UserMenu } from '@/components/auth/user_menu';
+import { DonateButton } from './donate_button';
 import { cn } from '@/lib/utils';
 
 interface ChatHeaderProps {
@@ -53,6 +54,9 @@ export function ChatHeader({
           </span>
         </div>
       </div>
+
+      {/* Donate button */}
+      <DonateButton />
 
       {/* New Chat button */}
       <button
