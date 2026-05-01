@@ -2,7 +2,7 @@
  * Auto-detect and cache user location via browser geolocation + reverse geocoding.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface UserLocation {
   zip_code: string;
@@ -53,9 +53,12 @@ export function useUserLocation() {
   const [loading, set_loading] = useState(true);
   const [error, set_error] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetch_location() {
-      // Check cache first
+  const fetch_location = useCallback(async (force_refresh = false) => {
+    set_loading(true);
+    set_error(null);
+
+    // Check cache first (unless force refresh)
+    if (!force_refresh) {
       const cached = localStorage.getItem(STORAGE_KEY);
       if (cached) {
         try {
@@ -71,41 +74,47 @@ export function useUserLocation() {
           localStorage.removeItem(STORAGE_KEY);
         }
       }
-
-      // Request geolocation
-      if (!navigator.geolocation) {
-        set_error('Geolocation not supported');
-        set_loading(false);
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          const geo_data = await reverse_geocode(latitude, longitude);
-
-          if (geo_data && geo_data.zip_code) {
-            const full_location = geo_data as UserLocation;
-            set_location(full_location);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(full_location));
-          } else {
-            set_error('Could not determine location');
-          }
-          set_loading(false);
-        },
-        (err) => {
-          set_error(err.message || 'Location access denied');
-          set_loading(false);
-        },
-        {
-          timeout: 10000,
-          maximumAge: 0,
-        }
-      );
     }
 
-    fetch_location();
+    // Request geolocation
+    if (!navigator.geolocation) {
+      set_error('Geolocation not supported');
+      set_loading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        const geo_data = await reverse_geocode(latitude, longitude);
+
+        if (geo_data && geo_data.zip_code) {
+          const full_location = geo_data as UserLocation;
+          set_location(full_location);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(full_location));
+        } else {
+          set_error('Could not determine location');
+        }
+        set_loading(false);
+      },
+      (err) => {
+        set_error(err.message || 'Location access denied');
+        set_loading(false);
+      },
+      {
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
   }, []);
 
-  return { location, loading, error };
+  useEffect(() => {
+    fetch_location();
+  }, [fetch_location]);
+
+  const refresh_location = useCallback(() => {
+    fetch_location(true);
+  }, [fetch_location]);
+
+  return { location, loading, error, refresh_location };
 }

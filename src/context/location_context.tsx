@@ -11,6 +11,7 @@ interface LocationContextValue {
   location: UserLocation | null;
   loading: boolean;
   error: string | null;
+  refresh_location: () => void;
 }
 
 const LocationContext = createContext<LocationContextValue | undefined>(undefined);

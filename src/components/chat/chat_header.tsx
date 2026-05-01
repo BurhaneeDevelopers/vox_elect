@@ -4,7 +4,7 @@
 
 'use client';
 
-import { PanelLeftOpen, PanelLeftClose, Info } from 'lucide-react';
+import { PanelLeftOpen, PanelLeftClose, Info, Plus } from 'lucide-react';
 import { UserMenu } from '@/components/auth/user_menu';
 import { cn } from '@/lib/utils';
 
@@ -13,6 +13,7 @@ interface ChatHeaderProps {
   info_panel_open: boolean;
   on_sidebar_toggle: () => void;
   on_info_panel_toggle: () => void;
+  on_new_chat?: () => void;
 }
 
 export function ChatHeader({
@@ -20,6 +21,7 @@ export function ChatHeader({
   info_panel_open,
   on_sidebar_toggle,
   on_info_panel_toggle,
+  on_new_chat,
 }: ChatHeaderProps) {
   return (
     <header
@@ -51,6 +53,16 @@ export function ChatHeader({
           </span>
         </div>
       </div>
+
+      {/* New Chat button */}
+      <button
+        onClick={on_new_chat}
+        aria-label="Start new chat"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#2D5016] text-white hover:bg-[#3d6b1f] transition-colors text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]"
+      >
+        <Plus size={14} aria-hidden="true" />
+        <span className="hidden sm:inline">New Chat</span>
+      </button>
 
       {/* Info panel toggle */}
       <button

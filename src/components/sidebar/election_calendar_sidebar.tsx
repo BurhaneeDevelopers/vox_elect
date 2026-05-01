@@ -8,10 +8,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, ChevronDown, ChevronUp, ExternalLink, Loader2, MapPin } from 'lucide-react';
 import { deadline_countdown as DeadlineCountdown } from './deadline_countdown';
+import { ChatHistorySidebar } from './chat_history_sidebar';
 import { use_election_calendar, use_state_deadlines, use_live_elections } from '@/hooks/use_election_data';
 import { use_chat_store } from '@/stores/chat_store';
 import { useLocation } from '@/context/location_context';
 import { format_date, days_until } from '@/lib/utils';
+import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { election_calendar_event } from '@/types/election_types';
 
@@ -122,7 +124,7 @@ function CalendarEventCard({ event }: { event: election_calendar_event }) {
 export function election_calendar_sidebar() {
   const { data: calendar, isLoading: calendar_loading, isError: calendar_error } =
     use_election_calendar();
-  const { location } = useLocation();
+  const { location, loading: location_loading, refresh_location } = useLocation();
   const { active_zip } = use_chat_store();
 
   // Use location from context or active_zip from store
@@ -148,12 +150,25 @@ export function election_calendar_sidebar() {
 
         {/* Location indicator */}
         {zip ? (
-          <div className="flex items-center gap-1.5 mb-3 px-2 py-1.5 rounded-lg bg-[#2D5016]/5 border border-[#2D5016]/10">
-            <MapPin size={11} className="text-[#2D5016]" aria-hidden="true" />
-            <span className="text-xs text-[#2D5016]">
-              ZIP: <strong>{zip}</strong>
-              {state && <span className="ml-1 text-[#57534e]">({state})</span>}
-            </span>
+          <div className="flex items-center justify-between gap-2 mb-3 px-2 py-1.5 rounded-lg bg-[#2D5016]/5 border border-[#2D5016]/10">
+            <div className="flex items-center gap-1.5">
+              <MapPin size={11} className="text-[#2D5016]" aria-hidden="true" />
+              <span className="text-xs text-[#2D5016]">
+                ZIP: <strong>{zip}</strong>
+                {state && <span className="ml-1 text-[#57534e]">({state})</span>}
+              </span>
+            </div>
+            <button
+              onClick={refresh_location}
+              disabled={location_loading}
+              className="p-1 rounded hover:bg-[#2D5016]/10 transition-colors disabled:opacity-50"
+              aria-label="Refresh location"
+            >
+              <RefreshCw
+                size={11}
+                className={cn('text-[#2D5016]', location_loading && 'animate-spin')}
+              />
+            </button>
           </div>
         ) : (
           <p className="text-xs text-[#a8a29e] mb-3 italic px-1">
@@ -185,52 +200,19 @@ export function election_calendar_sidebar() {
             Upcoming Events
           </p>
 
-          {(calendar_loading || live_loading) ? (
-            <div className="flex justify-center py-8" aria-live="polite" aria-label="Loading calendar">
-              <Loader2 size={18} className="animate-spin text-[#2D5016]" />
-            </div>
-          ) : calendar_error ? (
-            <p className="text-xs text-red-500 text-center py-3" role="alert">
-              Unable to load calendar.
+          <div className="text-center py-6 px-3 rounded-lg bg-white border border-[#E7E0D0]">
+            <p className="text-sm text-[#2D5016] font-medium">Coming Soon</p>
+            <p className="text-xs text-[#57534e] mt-1">
+              Election events will appear here
             </p>
-          ) : (
-            <div className="flex flex-col gap-1.5">
-              {/* Show live elections first if available */}
-              {live_elections && live_elections.length > 0 && (
-                <>
-                  {live_elections.map((election: any) => (
-                    <CalendarEventCard
-                      key={election.id}
-                      event={{
-                        id: election.id,
-                        title: election.name,
-                        date: election.election_day,
-                        type: 'general',
-                        description: election.description,
-                      }}
-                    />
-                  ))}
-                </>
-              )}
-              
-              {/* Show mock calendar only for US or when no country detected */}
-              {(!location?.country_code || location.country_code === 'US') && calendar
-                ?.sort((a, b) => a.date.localeCompare(b.date))
-                .map((event) => (
-                  <CalendarEventCard key={event.id} event={event} />
-                ))}
-              
-              {/* No events message for non-US */}
-              {location?.country_code && location.country_code !== 'US' && (!live_elections || live_elections.length === 0) && (
-                <div className="text-center py-6 px-3">
-                  <p className="text-xs text-[#57534e] leading-relaxed">
-                    No upcoming elections found for {location.country}.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+          </div>
         </div>
+
+        {/* Divider */}
+        <div className="border-t border-[#E7E0D0] my-3" />
+
+        {/* Chat History */}
+        <ChatHistorySidebar />
 
         {/* Attribution */}
         <p className="text-[10px] text-[#a8a29e] text-center mt-4 leading-relaxed">
