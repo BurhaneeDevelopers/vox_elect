@@ -6,6 +6,9 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import type { gemini_chat_request } from '@/types/chat_types';
 import { read_Elora_system_prompt } from './prompt_loader';
+import { detect_search_intent } from './search/detect_search_intent';
+import { search_civic_web } from './search/web_search';
+import { format_search_results } from './search/format_results';
 
 // Safety settings — balanced for civic education context
 const SAFETY_SETTINGS = [
@@ -70,10 +73,30 @@ export async function stream_chat_response(request: gemini_chat_request): Promis
 
   // Last message is the current user turn; history is everything before it
   const history = gemini_messages.slice(0, -1);
-  const last_message = gemini_messages[gemini_messages.length - 1];
+  let last_message = gemini_messages[gemini_messages.length - 1];
 
   if (!last_message) {
     throw new Error('No user message provided.');
+  }
+
+  // Check if query needs web search
+  const last_user_text = last_message.parts[0].text;
+  const needs_search = await detect_search_intent(last_user_text);
+  
+  if (needs_search) {
+    const search_results = await search_civic_web(
+      last_user_text,
+      request.location_context || undefined
+    );
+    
+    if (search_results.length > 0) {
+      const search_context = format_search_results(search_results);
+      // Prepend search results to user message
+      last_message = {
+        ...last_message,
+        parts: [{ text: `${search_context}User question: ${last_user_text}` }],
+      };
+    }
   }
 
   const chat = model.startChat({ history });

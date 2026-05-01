@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { chat_window as ChatWindow } from '@/components/chat/chat_window';
 import { election_calendar_sidebar as ElectionCalendarSidebar } from '@/components/sidebar/election_calendar_sidebar';
@@ -14,6 +14,8 @@ import { AuthGuard } from '@/components/auth/auth_guard';
 import { ChatHeader } from '@/components/chat/chat_header';
 import { ChatThreeColumnLayout } from '@/components/chat/chat_three_column_layout';
 import { create_query_client } from '@/lib/query_client_config';
+import { useLocation } from '@/context/location_context';
+import { use_chat_store } from '@/stores/chat_store';
 
 // Create QueryClient once at module level (stable across renders)
 const query_client = create_query_client();
@@ -21,6 +23,21 @@ const query_client = create_query_client();
 export function ChatPageClient() {
   const [sidebar_open, set_sidebar_open] = useState(true);
   const [info_panel_open, set_info_panel_open] = useState(false);
+  
+  const { location } = useLocation();
+  const { set_location_context } = use_chat_store();
+
+  // Sync location from context to chat store
+  useEffect(() => {
+    if (location?.zip_code) {
+      set_location_context({
+        zip_code: location.zip_code,
+        state: location.state,
+        city: undefined,
+        county: undefined,
+      });
+    }
+  }, [location, set_location_context]);
 
   return (
     <QueryClientProvider client={query_client}>
