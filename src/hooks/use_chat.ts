@@ -8,18 +8,7 @@ import { useCallback, useRef } from 'react';
 import { use_chat_store } from '@/stores/chat_store';
 import { use_voice } from './use_voice';
 import { sanitise_input } from '@/lib/utils';
-
-// Dynamic status messages that cycle during AI processing
-const AI_STATUS_MESSAGES = [
-  'Analyzing your question...',
-  'Searching civic databases...',
-  'Gathering election information...',
-  'Verifying details...',
-  'Consulting voter resources...',
-  'Preparing response...',
-  'Cross-referencing data...',
-  'Reviewing election guidelines...',
-];
+import { AI_STATUS_MESSAGES } from '@/lib/constants';
 
 export function useChat() {
   const {

@@ -15,7 +15,11 @@ export async function search_civic_web(
 ): Promise<SearchResult[]> {
   const api_key = process.env.TAVILY_API_KEY;
   if (!api_key) {
-    console.warn('[search_civic_web] TAVILY_API_KEY not set');
+    return [];
+  }
+
+  // Validate and sanitize query
+  if (!query || query.length > 500) {
     return [];
   }
 
@@ -44,7 +48,6 @@ export async function search_civic_web(
     });
 
     if (!response.ok) {
-      console.error('[search_civic_web] Tavily API error:', response.status);
       return [];
     }
 
@@ -63,8 +66,7 @@ export async function search_civic_web(
       snippet: result.content || '',
       published_date: result.published_date,
     }));
-  } catch (err) {
-    console.error('[search_civic_web] Error:', err);
+  } catch {
     return [];
   }
 }

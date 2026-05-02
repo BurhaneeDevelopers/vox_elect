@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stream_chat_response } from '@/lib/gemini_client';
 import { sanitise_input } from '@/lib/utils';
+import { RATE_LIMIT_MAX_REQUESTS, RATE_LIMIT_WINDOW_MS, MAX_MESSAGE_HISTORY } from '@/lib/constants';
 import type { gemini_chat_request } from '@/types/chat_types';
 
 export const runtime = 'nodejs';
@@ -14,8 +15,6 @@ export const dynamic = 'force-dynamic';
 // Rate limiting in-memory store (per IP, resets on server restart)
 // In production replace with Redis/Upstash
 const rate_limit_map = new Map<string, { count: number; reset_at: number }>();
-const RATE_LIMIT_MAX = 60;
-const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 function check_rate_limit(ip: string): boolean {
   const now = Date.now();
@@ -24,7 +23,7 @@ function check_rate_limit(ip: string): boolean {
     rate_limit_map.set(ip, { count: 1, reset_at: now + RATE_LIMIT_WINDOW_MS });
     return true;
   }
-  if (record.count >= RATE_LIMIT_MAX) return false;
+  if (record.count >= RATE_LIMIT_MAX_REQUESTS) return false;
   record.count++;
   return true;
 }
@@ -62,7 +61,7 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
   }
 
   // Limit conversation history to last 20 messages to manage token usage
-  const trimmed_messages = sanitised_messages.slice(-20);
+  const trimmed_messages = sanitised_messages.slice(-MAX_MESSAGE_HISTORY);
 
   try {
     const stream = await stream_chat_response({
@@ -91,7 +90,10 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
     });
   } catch (err) {
     const error_message = err instanceof Error ? err.message : 'Unknown error';
-    console.error('[/api/chat] Error:', error_message);
+    // Log error without exposing sensitive details
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[/api/chat] Error:', error_message);
+    }
     return NextResponse.json(
       { error: 'Elora is temporarily unavailable. Please try again.' },
       { status: 500 }

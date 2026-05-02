@@ -78,10 +78,20 @@ export async function open_razorpay_checkout(
   user_name?: string,
   user_email?: string
 ): Promise<RazorpayResponse> {
+  // Validate amount
+  if (!amount || amount < 100 || amount > 10000000) {
+    throw new Error('Invalid payment amount');
+  }
+
   const loaded = await load_razorpay_script();
 
   if (!loaded) {
     throw new Error('Failed to load Razorpay SDK');
+  }
+
+  const razorpay_key = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+  if (!razorpay_key) {
+    throw new Error('Razorpay configuration missing');
   }
 
   // Step 1: Create order
@@ -90,7 +100,7 @@ export async function open_razorpay_checkout(
   // Step 2: Open checkout modal
   return new Promise((resolve, reject) => {
     const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+      key: razorpay_key,
       amount: order.amount,
       currency: order.currency,
       name: 'Elora Civic Guide',

@@ -8,6 +8,7 @@ import type { gemini_chat_request } from '@/types/chat_types';
 import { detect_search_intent } from './search/detect_search_intent';
 import { search_civic_web } from './search/web_search';
 import { format_search_results } from './search/format_results';
+import { GEMINI_MODEL, GEMINI_TEMPERATURE, GEMINI_MAX_OUTPUT_TOKENS } from './constants';
 
 // Inline system prompt (server-side only)
 const ELORA_SYSTEM_PROMPT = `You are Elora, a warm and knowledgeable civic education guide.
@@ -73,10 +74,10 @@ const SAFETY_SETTINGS = [
 ];
 
 const GENERATION_CONFIG = {
-  temperature: 0.7,
+  temperature: GEMINI_TEMPERATURE,
   topK: 40,
   topP: 0.95,
-  maxOutputTokens: 2048,
+  maxOutputTokens: GEMINI_MAX_OUTPUT_TOKENS,
 };
 
 function get_gemini_client(): GoogleGenerativeAI {
@@ -117,7 +118,7 @@ export async function stream_chat_response(request: gemini_chat_request): Promis
   }
 
   const model = client.getGenerativeModel({
-    model: 'gemini-3.1-flash-lite-preview',
+    model: GEMINI_MODEL,
     systemInstruction: system_prompt + location_appendix,
     safetySettings: SAFETY_SETTINGS,
     generationConfig: GENERATION_CONFIG,
@@ -181,7 +182,7 @@ export async function stream_chat_response(request: gemini_chat_request): Promis
 export async function generate_text(prompt: string): Promise<string> {
   const client = get_gemini_client();
   const model = client.getGenerativeModel({
-    model: 'gemini-3.1-flash-lite-preview',
+    model: GEMINI_MODEL,
     safetySettings: SAFETY_SETTINGS,
     generationConfig: { ...GENERATION_CONFIG, maxOutputTokens: 256 },
   });

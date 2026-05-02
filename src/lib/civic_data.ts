@@ -35,6 +35,11 @@ export async function get_election_data(
   state?: string,
   country_code?: string
 ): Promise<Election[]> {
+  // Validate inputs
+  if (zip && !/^\d{5}$/.test(zip)) {
+    return [];
+  }
+
   // Try civicAPI.org first — no key needed
   try {
     const params = new URLSearchParams();
@@ -50,8 +55,8 @@ export async function get_election_data(
       const data = await response.json();
       return normalize_civic_api_elections(data);
     }
-  } catch (err) {
-    console.warn('[get_election_data] civicAPI.org failed:', err);
+  } catch {
+    // Silent fallback to search
   }
 
   // Fallback: Tavily web search
@@ -66,8 +71,7 @@ export async function get_election_data(
       election_day: extract_date_from_text(result.snippet) || 'Date TBD',
       description: result.snippet,
     }));
-  } catch (err) {
-    console.error('[get_election_data] Fallback search failed:', err);
+  } catch {
     return [];
   }
 }
@@ -78,8 +82,7 @@ export async function get_election_data(
  */
 export async function get_representatives(state_code: string): Promise<Representative[]> {
   const api_key = process.env.OPENSTATES_API_KEY;
-  if (!api_key) {
-    console.warn('[get_representatives] OPENSTATES_API_KEY not set');
+  if (!api_key || !state_code || !/^[A-Z]{2}$/.test(state_code)) {
     return [];
   }
 
@@ -90,14 +93,12 @@ export async function get_representatives(state_code: string): Promise<Represent
     });
 
     if (!response.ok) {
-      console.error('[get_representatives] OpenStates error:', response.status);
       return [];
     }
 
     const data = await response.json();
     return normalize_openstates_people(data.results || []);
-  } catch (err) {
-    console.error('[get_representatives] Error:', err);
+  } catch {
     return [];
   }
 }

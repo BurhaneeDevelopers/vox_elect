@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = await req.json();
 
+    // Validate required fields
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -17,7 +18,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const key_secret = process.env.RAZORPAY_KEY_SECRET!;
+    // Validate field types and format
+    if (
+      typeof razorpay_order_id !== 'string' ||
+      typeof razorpay_payment_id !== 'string' ||
+      typeof razorpay_signature !== 'string' ||
+      razorpay_order_id.length > 100 ||
+      razorpay_payment_id.length > 100 ||
+      razorpay_signature.length > 200
+    ) {
+      return NextResponse.json(
+        { error: 'Invalid field format' },
+        { status: 400 }
+      );
+    }
+
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!key_secret) {
+      return NextResponse.json(
+        { error: 'Payment verification unavailable' },
+        { status: 503 }
+      );
+    }
 
     // Generate signature: HMAC-SHA256(order_id + "|" + payment_id, KEY_SECRET)
     const generated_signature = crypto
@@ -25,7 +47,8 @@ export async function POST(req: NextRequest) {
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
 
-    if (generated_signature !== razorpay_signature) {
+    // Use timing-safe comparison
+    if (!crypto.timingSafeEqual(Buffer.from(generated_signature), Buffer.from(razorpay_signature))) {
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 400 }
@@ -33,17 +56,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Signature valid - payment verified
-    // TODO: Save to Supabase donations table if needed
-
     return NextResponse.json({
       success: true,
       payment_id: razorpay_payment_id,
       order_id: razorpay_order_id,
     });
-  } catch (error: any) {
-    console.error('[verify-payment] Error:', error);
+  } catch (error: unknown) {
+    const error_message = error instanceof Error ? error.message : 'Verification failed';
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[verify-payment] Error:', error_message);
+    }
     return NextResponse.json(
-      { error: error.message || 'Verification failed' },
+      { error: 'Payment verification failed' },
       { status: 500 }
     );
   }

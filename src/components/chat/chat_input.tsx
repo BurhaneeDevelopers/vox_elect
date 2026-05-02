@@ -9,23 +9,14 @@ import { motion } from 'framer-motion';
 import { Send, MapPin, X } from 'lucide-react';
 import { voice_button as VoiceButton } from './voice_button';
 import { use_chat_store } from '@/stores/chat_store';
-import { is_valid_zip_code, sanitise_input } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { is_valid_zip_code, sanitise_input, cn } from '@/lib/utils';
+import { MAX_INPUT_LENGTH, QUICK_PROMPTS } from '@/lib/constants';
 
 interface chat_input_props {
   on_send: (message: string) => void;
   is_loading: boolean;
   on_cancel?: () => void;
 }
-
-const MAX_INPUT_LENGTH = 1000;
-
-const QUICK_PROMPTS = [
-  'How do I register to vote?',
-  'What is the Electoral College?',
-  'How are mail-in ballots counted?',
-  'When is the next election in my area?',
-];
 
 export function chat_input({ on_send, is_loading, on_cancel }: chat_input_props) {
   const [input_value, set_input_value] = useState('');

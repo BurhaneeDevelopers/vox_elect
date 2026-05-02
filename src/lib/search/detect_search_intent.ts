@@ -29,7 +29,7 @@ Query: {query}`;
 export async function detect_search_intent(query: string): Promise<boolean> {
   try {
     const api_key = process.env.GEMINI_API_KEY;
-    if (!api_key) return false;
+    if (!api_key || !query || query.length > 500) return false;
 
     const client = new GoogleGenerativeAI(api_key);
     const model = client.getGenerativeModel({
@@ -45,8 +45,7 @@ export async function detect_search_intent(query: string): Promise<boolean> {
     const response = result.response.text().trim().toUpperCase();
 
     return response === 'YES';
-  } catch (err) {
-    console.error('[detect_search_intent] Error:', err);
+  } catch {
     return false;
   }
 }

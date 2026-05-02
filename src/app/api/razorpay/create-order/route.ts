@@ -6,18 +6,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 
+const RAZORPAY_KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
+
 export async function POST(req: NextRequest) {
+  if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
+    return NextResponse.json(
+      { error: 'Payment service not configured' },
+      { status: 503 }
+    );
+  }
+
   const razorpay = new Razorpay({
-    key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'dummy_key',
-    key_secret: process.env.RAZORPAY_KEY_SECRET || 'dummy_secret',
+    key_id: RAZORPAY_KEY_ID,
+    key_secret: RAZORPAY_KEY_SECRET,
   });
+
   try {
     const { amount, currency = 'INR' } = await req.json();
 
-    // Validate amount (min 100 paise = ₹1)
-    if (!amount || amount < 100) {
+    // Validate amount (min 100 paise = ₹1, max ₹100,000)
+    if (!amount || typeof amount !== 'number' || amount < 100 || amount > 10000000) {
       return NextResponse.json(
-        { error: 'Amount must be at least 100 paise' },
+        { error: 'Invalid amount. Must be between ₹1 and ₹100,000' },
+        { status: 400 }
+      );
+    }
+
+    // Validate currency
+    if (currency !== 'INR') {
+      return NextResponse.json(
+        { error: 'Only INR currency supported' },
         { status: 400 }
       );
     }
@@ -35,10 +54,13 @@ export async function POST(req: NextRequest) {
       amount: order.amount,
       currency: order.currency,
     });
-  } catch (error: any) {
-    console.error('[create-order] Error:', error);
+  } catch (error: unknown) {
+    const error_message = error instanceof Error ? error.message : 'Failed to create order';
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[create-order] Error:', error_message);
+    }
     return NextResponse.json(
-      { error: error.message || 'Failed to create order' },
+      { error: 'Unable to create payment order' },
       { status: 500 }
     );
   }

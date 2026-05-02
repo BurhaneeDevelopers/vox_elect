@@ -33,6 +33,11 @@ export function DonateButton() {
       return;
     }
 
+    if (final_amount > 100000) {
+      toast.error('Maximum donation amount is ₹100,000');
+      return;
+    }
+
     set_loading(true);
 
     try {
@@ -42,21 +47,20 @@ export function DonateButton() {
         user?.email
       );
 
-      console.log('[Razorpay] Payment verified:', response);
       toast.success('Thank you for your donation! 🙏', {
         description: `₹${final_amount} received successfully`,
       });
       set_modal_open(false);
       set_custom_amount('');
       set_selected_amount(500);
-    } catch (err: any) {
-      console.error('[Razorpay] Error:', err);
+    } catch (err: unknown) {
+      const error_message = err instanceof Error ? err.message : 'Unknown error';
 
-      if (err.message === 'Payment cancelled by user') {
+      if (error_message === 'Payment cancelled by user') {
         toast.info('Payment cancelled');
       } else {
         toast.error('Payment failed', {
-          description: err.message || 'Please try again',
+          description: 'Please try again',
         });
       }
     } finally {
@@ -85,6 +89,9 @@ export function DonateButton() {
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           onClick={() => set_modal_open(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="donate-modal-title"
         >
           <div
             className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative"
@@ -93,17 +100,19 @@ export function DonateButton() {
             {/* Close button */}
             <button
               onClick={() => set_modal_open(false)}
-              className="absolute top-4 right-4 p-1 rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label="Close"
+              className="absolute top-4 right-4 p-1 rounded-lg hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]"
+              aria-label="Close donation modal"
             >
-              <X size={18} className="text-gray-500" />
+              <X size={18} className="text-gray-500" aria-hidden="true" />
             </button>
 
             {/* Header */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <Heart size={20} className="text-[#C9A84C] fill-current" />
-                <h2 className="text-xl font-bold text-[#2D5016]">Support Elora</h2>
+                <Heart size={20} className="text-[#C9A84C] fill-current" aria-hidden="true" />
+                <h2 id="donate-modal-title" className="text-xl font-bold text-[#2D5016]">
+                  Support Elora
+                </h2>
               </div>
               <p className="text-sm text-[#57534e]">
                 Help us keep civic information free and accessible for everyone
@@ -111,61 +120,73 @@ export function DonateButton() {
             </div>
 
             {/* Preset amounts */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              {PRESET_AMOUNTS.map((preset) => (
-                <button
-                  key={preset.value}
-                  onClick={() => {
-                    set_selected_amount(preset.value);
-                    set_custom_amount('');
-                  }}
-                  className={cn(
-                    'relative p-4 rounded-xl border-2 transition-all text-center',
-                    preset.is_popular
-                      ? 'border-[#C9A84C] bg-gradient-to-br from-[#C9A84C]/10 to-[#d4b55e]/10'
-                      : 'border-[#E7E0D0] hover:border-[#2D5016]/30',
-                    selected_amount === preset.value && !custom_amount
-                      ? preset.is_popular
-                        ? 'ring-2 ring-[#C9A84C]'
-                        : 'border-[#2D5016] bg-[#2D5016]/5'
-                      : ''
-                  )}
-                >
-                  {preset.badge && (
-                    <div className="absolute -top-2 -right-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-[#C9A84C] to-[#d4b55e] text-white text-[10px] font-medium shadow-md whitespace-nowrap">
-                      <Sparkles size={10} />
-                      {preset.badge}
-                    </div>
-                  )}
-                  <div
+            <fieldset className="mb-4">
+              <legend className="sr-only">Select donation amount</legend>
+              <div className="grid grid-cols-2 gap-3">
+                {PRESET_AMOUNTS.map((preset) => (
+                  <button
+                    key={preset.value}
+                    type="button"
+                    onClick={() => {
+                      set_selected_amount(preset.value);
+                      set_custom_amount('');
+                    }}
+                    aria-pressed={selected_amount === preset.value && !custom_amount}
+                    aria-label={`Donate ${preset.label}${preset.badge ? ` - ${preset.badge}` : ''}`}
                     className={cn(
-                      'text-2xl font-bold',
-                      preset.is_popular ? 'text-[#C9A84C]' : 'text-[#2D5016]'
+                      'relative p-4 rounded-xl border-2 transition-all text-center',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]',
+                      preset.is_popular
+                        ? 'border-[#C9A84C] bg-gradient-to-br from-[#C9A84C]/10 to-[#d4b55e]/10'
+                        : 'border-[#E7E0D0] hover:border-[#2D5016]/30',
+                      selected_amount === preset.value && !custom_amount
+                        ? preset.is_popular
+                          ? 'ring-2 ring-[#C9A84C]'
+                          : 'border-[#2D5016] bg-[#2D5016]/5'
+                        : ''
                     )}
                   >
-                    {preset.label}
-                  </div>
-                </button>
-              ))}
-            </div>
+                    {preset.badge && (
+                      <div className="absolute -top-2 -right-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-[#C9A84C] to-[#d4b55e] text-white text-[10px] font-medium shadow-md whitespace-nowrap" aria-hidden="true">
+                        <Sparkles size={10} />
+                        {preset.badge}
+                      </div>
+                    )}
+                    <div
+                      className={cn(
+                        'text-2xl font-bold',
+                        preset.is_popular ? 'text-[#C9A84C]' : 'text-[#2D5016]'
+                      )}
+                    >
+                      {preset.label}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
 
             {/* Custom amount */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-[#2D5016] mb-2">
+              <label htmlFor="custom-amount" className="block text-sm font-medium text-[#2D5016] mb-2">
                 Or enter custom amount (min ₹100)
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#57534e] font-medium">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#57534e] font-medium" aria-hidden="true">
                   ₹
                 </span>
                 <input
+                  id="custom-amount"
                   type="number"
                   min="100"
                   value={custom_amount}
                   onChange={(e) => set_custom_amount(e.target.value)}
                   placeholder="Enter amount"
-                  className="w-full pl-8 pr-4 py-3 border-2 border-[#E7E0D0] rounded-xl focus:border-[#2D5016] focus:outline-none transition-colors"
+                  aria-describedby="amount-hint"
+                  className="w-full pl-8 pr-4 py-3 border-2 border-[#E7E0D0] rounded-xl focus:border-[#2D5016] focus:outline-none focus:ring-2 focus:ring-[#C9A84C] transition-colors"
                 />
+                <span id="amount-hint" className="sr-only">
+                  Enter custom donation amount in rupees, minimum 100
+                </span>
               </div>
             </div>
 
@@ -173,17 +194,20 @@ export function DonateButton() {
             <button
               onClick={handle_donate}
               disabled={loading || final_amount < 100}
+              aria-live="polite"
+              aria-busy={loading}
               className={cn(
                 'w-full py-3 rounded-xl font-semibold text-white transition-all',
                 'bg-gradient-to-r from-[#2D5016] to-[#3d6b1f]',
                 'hover:from-[#3d6b1f] hover:to-[#2D5016] hover:shadow-lg',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] focus-visible:ring-offset-2',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 'flex items-center justify-center gap-2'
               )}
             >
               {loading ? (
                 <>
-                  <Loader2 size={18} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin" aria-hidden="true" />
                   Processing...
                 </>
               ) : (

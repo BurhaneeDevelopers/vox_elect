@@ -17,10 +17,23 @@ export function generate_id(): string {
 
 /**
  * Sanitise user-supplied strings for use in API calls.
- * Trims whitespace, collapses multiple spaces, limits length.
+ * Trims whitespace, collapses multiple spaces, limits length, removes control chars.
  */
 export function sanitise_input(input: string, max_length = 2000): string {
-  return input.replace(/\s+/g, ' ').trim().slice(0, max_length);
+  return input
+    .replace(/[\x00-\x1F\x7F]/g, ' ') // Replace control characters with space
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max_length);
+}
+
+/** Sanitise HTML to prevent XSS - strips all tags except safe formatting */
+export function sanitise_html(input: string): string {
+  return input
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/javascript:/gi, '');
 }
 
 /** Validate ZIP code format (US 5-digit) */
