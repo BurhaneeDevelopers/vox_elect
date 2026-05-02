@@ -150,6 +150,17 @@ export function LoginForm() {
           </Link>
         </p>
       </div>
+
+      {/* Legal Links */}
+      <div className="mt-4 flex justify-center items-center gap-4 text-xs text-[#78716c]">
+        <Link href="/terms-and-conditions" className="hover:text-[#2D5016] hover:underline transition-colors">
+          Terms & Conditions
+        </Link>
+        <span>•</span>
+        <Link href="/privacy-policy" className="hover:text-[#2D5016] hover:underline transition-colors">
+          Privacy Policy
+        </Link>
+      </div>
     </motion.div>
   );
 }

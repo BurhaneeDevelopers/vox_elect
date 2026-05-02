@@ -7,7 +7,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, LogOut, ChevronDown } from 'lucide-react';
+import { User, LogOut, ChevronDown, FileText, Shield } from 'lucide-react';
+import Link from 'next/link';
 import { use_auth } from '@/hooks/use_auth';
 
 export function UserMenu() {
@@ -64,6 +65,26 @@ export function UserMenu() {
                   {user.full_name || 'User'}
                 </p>
                 <p className="text-xs text-[#78716c] mt-0.5">{user.email}</p>
+              </div>
+
+              {/* Legal Links */}
+              <div className="py-1 border-b border-[#E7E0D0]">
+                <Link
+                  href="/terms-and-conditions"
+                  className="w-full px-4 py-2 flex items-center gap-2 text-left hover:bg-[#F5F0E8] transition-colors"
+                  onClick={() => set_is_open(false)}
+                >
+                  <FileText className="w-4 h-4 text-[#78716c]" />
+                  <span className="text-sm font-medium text-[#57534e]">Terms & Conditions</span>
+                </Link>
+                <Link
+                  href="/privacy-policy"
+                  className="w-full px-4 py-2 flex items-center gap-2 text-left hover:bg-[#F5F0E8] transition-colors"
+                  onClick={() => set_is_open(false)}
+                >
+                  <Shield className="w-4 h-4 text-[#78716c]" />
+                  <span className="text-sm font-medium text-[#57534e]">Privacy Policy</span>
+                </Link>
               </div>
 
               {/* Logout Button */}
