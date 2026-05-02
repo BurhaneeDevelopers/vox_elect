@@ -6,6 +6,8 @@
 
 import { motion } from 'framer-motion';
 import { HelpCircle } from 'lucide-react';
+import { use_chat_store } from '@/stores/chat_store';
+import { cn } from '@/lib/utils';
 
 interface suggested_questions_bar_props {
   questions: string[];
@@ -13,6 +15,8 @@ interface suggested_questions_bar_props {
 }
 
 export function suggested_questions_bar({ questions, on_select }: suggested_questions_bar_props) {
+  const { voice_state } = use_chat_store();
+  
   if (questions.length === 0) return null;
 
   return (
@@ -28,15 +32,13 @@ export function suggested_questions_bar({ questions, on_select }: suggested_ques
         <button
           key={i}
           onClick={() => on_select(q)}
-          className="
-            flex items-center gap-1.5 text-xs px-3 py-1.5
-            bg-[#F5F0E8] hover:bg-[#EDE7D6]
-            border border-[#2D5016]/20 hover:border-[#2D5016]/40
-            text-[#2D5016] rounded-full
-            transition-colors duration-150
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]
-            cursor-pointer
-          "
+          disabled={voice_state === 'listening'}
+          className={cn(
+            "flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]",
+            voice_state === 'listening'
+              ? "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-[#F5F0E8] hover:bg-[#EDE7D6] border border-[#2D5016]/20 hover:border-[#2D5016]/40 text-[#2D5016] cursor-pointer"
+          )}
           aria-label={`Ask: ${q}`}
         >
           <HelpCircle size={11} aria-hidden="true" />

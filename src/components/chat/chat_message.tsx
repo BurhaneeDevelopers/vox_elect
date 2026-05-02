@@ -44,7 +44,7 @@ export function ChatMessage({
   const [is_hovered, set_is_hovered] = useState(false);
   const [is_editing, set_is_editing] = useState(false);
   const [edit_value, set_edit_value] = useState(message.content);
-  const { ai_activity_status } = use_chat_store();
+  const { ai_activity_status, voice_state } = use_chat_store();
   
   const is_user = message.role === 'user';
   const is_error = message.status === 'error';
@@ -175,7 +175,7 @@ export function ChatMessage({
           <div className="flex items-center gap-2 text-xs text-[#57534e]">
             <button
               onClick={() => on_prev_sibling?.(message.id)}
-              disabled={sibling_index === 0}
+              disabled={sibling_index === 0 || voice_state === 'listening'}
               className="p-1 rounded hover:bg-[#F5F0E8] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               aria-label="Previous response"
             >
@@ -186,7 +186,7 @@ export function ChatMessage({
             </span>
             <button
               onClick={() => on_next_sibling?.(message.id)}
-              disabled={sibling_index === sibling_count - 1}
+              disabled={sibling_index === sibling_count - 1 || voice_state === 'listening'}
               className="p-1 rounded hover:bg-[#F5F0E8] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               aria-label="Next response"
             >
@@ -197,7 +197,7 @@ export function ChatMessage({
 
         {/* Hover actions - below bubble */}
         <AnimatePresence>
-          {is_hovered && message.status === 'complete' && !is_editing && (
+          {is_hovered && message.status === 'complete' && !is_editing && voice_state !== 'listening' && (
             <MessageActions
               message_id={message.id}
               role={message.role}

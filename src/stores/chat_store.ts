@@ -55,7 +55,7 @@ export const use_chat_store = create<chat_store_state>((set, get) => ({
   is_loading: false,
   ai_activity_status: 'Thinking...',
   voice_state: 'idle',
-  voice_mode: 'push_to_talk',
+  voice_mode: 'toggle',
   tts_enabled: false,
   right_panel_open: false,
   active_zip: null,

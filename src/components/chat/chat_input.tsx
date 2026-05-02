@@ -6,7 +6,7 @@
 
 import { useState, useRef, useCallback, KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Send, MapPin, Volume2, VolumeX, X } from 'lucide-react';
+import { Send, MapPin, X } from 'lucide-react';
 import { voice_button as VoiceButton } from './voice_button';
 import { use_chat_store } from '@/stores/chat_store';
 import { is_valid_zip_code, sanitise_input } from '@/lib/utils';
@@ -32,7 +32,7 @@ export function chat_input({ on_send, is_loading, on_cancel }: chat_input_props)
   const [show_zip_hint, set_show_zip_hint] = useState(false);
   const textarea_ref = useRef<HTMLTextAreaElement>(null);
 
-  const { tts_enabled, toggle_tts, active_zip, set_location_context, clear_location_context } =
+  const { active_zip, set_location_context, clear_location_context, voice_state } =
     use_chat_store();
 
   const detected_zip = input_value.match(/\b(\d{5})\b/)?.[1];
@@ -72,10 +72,8 @@ export function chat_input({ on_send, is_loading, on_cancel }: chat_input_props)
   const handle_voice_transcript = useCallback(
     (transcript: string) => {
       set_input_value(transcript);
-      // Auto-send voice transcript
-      setTimeout(() => on_send(transcript), 100);
     },
-    [on_send]
+    []
   );
 
   const handle_quick_prompt = (prompt: string) => {
@@ -97,7 +95,13 @@ export function chat_input({ on_send, is_loading, on_cancel }: chat_input_props)
             <button
               key={prompt}
               onClick={() => handle_quick_prompt(prompt)}
-              className="text-xs px-3 py-1 rounded-full bg-[#F5F0E8] hover:bg-[#EDE7D6] border border-[#E7E0D0] text-[#2D5016] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[#C9A84C] focus-visible:outline-none"
+              disabled={voice_state === 'listening'}
+              className={cn(
+                "text-xs px-3 py-1 rounded-full border transition-colors focus-visible:ring-2 focus-visible:ring-[#C9A84C] focus-visible:outline-none",
+                voice_state === 'listening' 
+                  ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed" 
+                  : "bg-[#F5F0E8] hover:bg-[#EDE7D6] border-[#E7E0D0] text-[#2D5016] cursor-pointer"
+              )}
               aria-label={`Quick question: ${prompt}`}
             >
               {prompt}
@@ -143,17 +147,6 @@ export function chat_input({ on_send, is_loading, on_cancel }: chat_input_props)
           'focus-within:border-[#2D5016] focus-within:shadow-sm border-[#E7E0D0]'
         )}
       >
-        {/* TTS toggle */}
-        <button
-          type="button"
-          onClick={toggle_tts}
-          aria-label={tts_enabled ? 'Turn off voice responses' : 'Turn on voice responses'}
-          aria-pressed={tts_enabled}
-          className="flex-shrink-0 mb-1 text-[#57534e] hover:text-[#2D5016] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] rounded p-0.5"
-        >
-          {tts_enabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-        </button>
-
         {/* Textarea */}
         <textarea
           ref={textarea_ref}
@@ -163,7 +156,7 @@ export function chat_input({ on_send, is_loading, on_cancel }: chat_input_props)
           placeholder="Ask Elora about elections, voting, candidates…"
           rows={1}
           maxLength={MAX_INPUT_LENGTH}
-          disabled={is_loading}
+          disabled={is_loading || voice_state === 'listening'}
           aria-label="Message to Elora"
           aria-describedby="char_count"
           className="flex-1 resize-none bg-transparent outline-none text-sm text-[#1C1917] placeholder-[#a8a29e] leading-relaxed min-h-[24px] max-h-[140px] py-0.5 disabled:opacity-60"
@@ -202,14 +195,14 @@ export function chat_input({ on_send, is_loading, on_cancel }: chat_input_props)
           <motion.button
             type="button"
             onClick={handle_submit}
-            disabled={!input_value.trim() || is_loading}
+            disabled={!input_value.trim() || is_loading || voice_state === 'listening'}
             aria-label="Send message"
             whileHover={input_value.trim() ? { scale: 1.05 } : {}}
             whileTap={input_value.trim() ? { scale: 0.95 } : {}}
             className={cn(
               'flex-shrink-0 mb-0.5 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] focus-visible:ring-offset-2',
-              input_value.trim()
+              input_value.trim() && !is_loading && voice_state !== 'listening'
                 ? 'bg-[#2D5016] hover:bg-[#3d6b1f] text-white shadow-sm cursor-pointer'
                 : 'bg-[#E7E0D0] text-[#a8a29e] cursor-not-allowed'
             )}

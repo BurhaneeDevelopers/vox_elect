@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import { PanelLeftOpen, PanelLeftClose, Info, Plus } from 'lucide-react';
 import { UserMenu } from '@/components/auth/user_menu';
 import { DonateButton } from './donate_button';
+import { use_chat_store } from '@/stores/chat_store';
 import { cn } from '@/lib/utils';
 
 interface ChatHeaderProps {
@@ -32,6 +33,7 @@ export function ChatHeader({
   on_new_chat,
 }: ChatHeaderProps) {
   const router = useRouter();
+  const { voice_state } = use_chat_store();
 
   // FIX: always use client-side navigation for New Chat.
   // Previously callers were doing window.location.href = '/chat' which caused
@@ -81,8 +83,14 @@ export function ChatHeader({
       {/* New Chat button — FIX: calls handle_new_chat (router-based) */}
       <button
         onClick={handle_new_chat}
+        disabled={voice_state === 'listening'}
         aria-label="Start new chat"
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#2D5016] text-white hover:bg-[#3d6b1f] transition-colors text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]"
+        className={cn(
+          "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]",
+          voice_state === 'listening'
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : "bg-[#2D5016] text-white hover:bg-[#3d6b1f]"
+        )}
       >
         <Plus size={14} aria-hidden="true" />
         <span className="hidden sm:inline">New Chat</span>
