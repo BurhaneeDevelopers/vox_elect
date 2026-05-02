@@ -8,9 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test": "bunx jest",
+    "test:watch": "bunx jest --watch",
+    "test:coverage": "bunx jest --coverage",
     "prepare": "husky install",
     "check-secrets": "git diff --cached --name-only | grep -E '\\.env' && echo 'ERROR: .env file in commit!' && exit 1 || exit 0"
   },
@@ -38,7 +38,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.1.5",
-    "@testing-library/react": "^14.1.2",
+    "@testing-library/react": "^16.1.0",
     "@types/dom-speech-recognition": "^0.0.10",
     "@types/jest": "^29.5.11",
     "@types/node": "^20",
