@@ -45,7 +45,7 @@ export function use_login() {
       // Update cache with user data
       query_client.setQueryData(AUTH_QUERY_KEY, user);
       // Redirect to chat
-      router.push('/chat');
+      window.location.href = '/chat';
     },
   });
 }
@@ -63,7 +63,7 @@ export function use_register() {
       // Update cache with user data
       query_client.setQueryData(AUTH_QUERY_KEY, user);
       // Redirect to chat
-      router.push('/chat');
+      window.location.href = '/chat';
     },
   });
 }
@@ -81,7 +81,7 @@ export function use_logout() {
       // Clear user from cache
       query_client.setQueryData(AUTH_QUERY_KEY, null);
       // Redirect to login
-      router.push('/login');
+      window.location.href = '/login';
     },
   });
 }
@@ -99,7 +99,7 @@ export function use_anonymous_signin() {
       // Update cache with anonymous user data
       query_client.setQueryData(AUTH_QUERY_KEY, user);
       // Redirect to chat
-      router.push('/chat');
+      window.location.href = '/chat';
     },
   });
 }
