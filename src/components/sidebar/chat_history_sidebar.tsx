@@ -14,10 +14,10 @@ export function ChatHistorySidebar() {
     active_conversation_id,
     select_conversation,
     remove_conversation,
-    is_loading_history,
+    is_loading,
   } = useChatHistory();
 
-  if (is_loading_history) {
+  if (is_loading) {
     return (
       <div className="p-3 flex justify-center">
         <Loader2 size={14} className="animate-spin text-[#2D5016]" />

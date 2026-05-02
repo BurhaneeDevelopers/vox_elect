@@ -13,7 +13,7 @@ interface message_actions_props {
   message_id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
-  on_edit?: (message_id: string) => void;
+  on_edit?: () => void;
   on_rerun?: (message_id: string) => void;
   on_copy?: (content: string) => void;
 }
@@ -39,7 +39,7 @@ export function message_actions({
   };
 
   const handle_edit = () => {
-    on_edit?.(message_id);
+    on_edit?.();
   };
 
   const handle_rerun = () => {

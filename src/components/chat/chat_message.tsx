@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, User, Loader2 } from 'lucide-react';
+import { AlertCircle, User, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { response_renderer as ResponseRenderer } from './response_renderer';
 import { suggested_questions_bar as SuggestedQuestionsBar } from './suggested_questions_bar';
 import { message_actions as MessageActions } from './message_actions';
@@ -20,9 +20,13 @@ interface chat_message_props {
   message: chat_message;
   on_suggested_question?: (q: string) => void;
   is_last?: boolean;
-  on_edit?: (message_id: string) => void;
+  on_edit?: (message_id: string, new_content: string) => void;
   on_rerun?: (message_id: string) => void;
   on_copy?: (content: string) => void;
+  on_prev_sibling?: (message_id: string) => void;
+  on_next_sibling?: (message_id: string) => void;
+  sibling_index?: number;
+  sibling_count?: number;
 }
 
 export function ChatMessage({
@@ -32,13 +36,31 @@ export function ChatMessage({
   on_edit,
   on_rerun,
   on_copy,
+  on_prev_sibling,
+  on_next_sibling,
+  sibling_index,
+  sibling_count,
 }: chat_message_props) {
   const [is_hovered, set_is_hovered] = useState(false);
+  const [is_editing, set_is_editing] = useState(false);
+  const [edit_value, set_edit_value] = useState(message.content);
   const { ai_activity_status } = use_chat_store();
   
   const is_user = message.role === 'user';
   const is_error = message.status === 'error';
   const is_streaming = message.status === 'streaming';
+
+  const handle_save_edit = () => {
+    if (edit_value.trim() && edit_value !== message.content) {
+      on_edit?.(message.id, edit_value.trim());
+    }
+    set_is_editing(false);
+  };
+
+  const handle_cancel_edit = () => {
+    set_edit_value(message.content);
+    set_is_editing(false);
+  };
 
   return (
     <motion.div
@@ -102,8 +124,38 @@ export function ChatMessage({
             </div>
           )}
 
-          {is_user ? (
-            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+          {is_editing ? (
+            <div className="flex flex-col gap-2">
+              <textarea
+                value={edit_value}
+                onChange={(e) => set_edit_value(e.target.value)}
+                className="w-full min-h-[60px] p-2 text-sm border border-[#E7E0D0] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#C9A84C] bg-white"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    handle_save_edit();
+                  } else if (e.key === 'Escape') {
+                    handle_cancel_edit();
+                  }
+                }}
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={handle_cancel_edit}
+                  className="px-3 py-1 text-xs rounded-lg border border-[#E7E0D0] hover:bg-[#F5F0E8] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handle_save_edit}
+                  className="px-3 py-1 text-xs rounded-lg bg-[#2D5016] text-white hover:bg-[#3d6b1f] transition-colors"
+                >
+                  Save & Submit
+                </button>
+              </div>
+            </div>
+          ) : is_user ? (
+            <p className="text-sm leading-relaxed whitespace-pre-wrap wrap-break-word">
               {message.content}
             </p>
           ) : is_streaming && !message.content ? (
@@ -118,14 +170,39 @@ export function ChatMessage({
           )}
         </div>
 
+        {/* Branch navigation for assistant messages with siblings */}
+        {!is_user && sibling_count && sibling_count > 1 && sibling_index !== undefined && (
+          <div className="flex items-center gap-2 text-xs text-[#57534e]">
+            <button
+              onClick={() => on_prev_sibling?.(message.id)}
+              disabled={sibling_index === 0}
+              className="p-1 rounded hover:bg-[#F5F0E8] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              aria-label="Previous response"
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <span className="font-medium">
+              {sibling_index + 1} / {sibling_count}
+            </span>
+            <button
+              onClick={() => on_next_sibling?.(message.id)}
+              disabled={sibling_index === sibling_count - 1}
+              className="p-1 rounded hover:bg-[#F5F0E8] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              aria-label="Next response"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
+
         {/* Hover actions - below bubble */}
         <AnimatePresence>
-          {is_hovered && message.status === 'complete' && (
+          {is_hovered && message.status === 'complete' && !is_editing && (
             <MessageActions
               message_id={message.id}
               role={message.role}
               content={message.content}
-              on_edit={on_edit}
+              on_edit={() => set_is_editing(true)}
               on_rerun={on_rerun}
               on_copy={on_copy}
             />

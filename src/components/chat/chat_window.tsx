@@ -1,19 +1,9 @@
-'use client';
-
 /**
- * Main chat window with persistent history
- *
- * FIXES:
- * 1. Duplicate messages — snapshot history_messages BEFORE append_message so the
- *    stale closure doesn't double-add the user turn to ai_messages.
- * 2. Streaming not visible — removed the premature window.location.href redirect
- *    that was killing the stream before it could render.
- * 3. Redirect — replaced hard window.location.href with router.push so React
- *    state is preserved and the redirect only fires after streaming completes.
- * 4. Double-submit guard — useRef flag stops React StrictMode from firing
- *    handle_send twice, which was the root cause of duplicate DB writes.
- * 5. Error state — surfaces API errors in the UI instead of swallowing them.
+ * Chat window with branching support
+ * Production-grade implementation
  */
+
+'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -24,8 +14,8 @@ import { chat_input as ChatInput } from './chat_input';
 import { useChatHistory } from '@/context/chat_history_context';
 import { use_chat_store } from '@/stores/chat_store';
 import { use_voice } from '@/hooks/use_voice';
+import { extract_suggested_question, strip_suggested_question } from '@/lib/utils';
 
-// Status messages during AI processing
 const AI_STATUS_MESSAGES = [
   'Analyzing your question...',
   'Searching civic databases...',
@@ -33,34 +23,38 @@ const AI_STATUS_MESSAGES = [
   'Verifying details...',
   'Consulting voter resources...',
   'Preparing response...',
-  'Cross-referencing data...',
-  'Reviewing election guidelines...',
 ];
 
 function ChatWindow() {
   const {
-    messages: history_messages,
+    messages,
     active_conversation_id,
-    on_first_message,
-    append_message,
-    is_loading_history,
+    is_loading,
+    create_first_message,
+    add_message,
+    regenerate,
+    edit_message,
+    navigate_sibling,
   } = useChatHistory();
 
-  const { session, set_ai_activity_status } = use_chat_store();
+  const { session, set_ai_activity_status, tts_enabled } = use_chat_store();
   const { speak } = use_voice(() => {});
   const router = useRouter();
 
   const [is_streaming, set_streaming] = useState(false);
   const [streaming_content, set_streaming_content] = useState('');
-  // FIX 4: guard against React StrictMode double-invocation
+  const [error_msg, set_error_msg] = useState<string | null>(null);
+  
   const is_submitting = useRef(false);
-  const scroll_ref = useRef<HTMLDivElement>(null);
-  const bottom_ref = useRef<HTMLDivElement>(null);
   const abort_controller_ref = useRef<AbortController | null>(null);
-  const [error_message, set_error_message] = useState<string | null>(null);
   const status_interval_ref = useRef<NodeJS.Timeout | null>(null);
+  const bottom_ref = useRef<HTMLDivElement>(null);
+  const last_user_msg_id_ref = useRef<string | null>(null);
 
+  // ============================================================================
   // Status cycling
+  // ============================================================================
+  
   const start_status_cycling = useCallback(() => {
     let index = 0;
     set_ai_activity_status(AI_STATUS_MESSAGES[0]);
@@ -78,123 +72,210 @@ function ChatWindow() {
     set_ai_activity_status('');
   }, [set_ai_activity_status]);
 
-  // Auto-scroll whenever new content arrives
+  // ============================================================================
+  // Auto-scroll
+  // ============================================================================
+  
   useEffect(() => {
     bottom_ref.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [history_messages.length, streaming_content]);
+  }, [messages.length, streaming_content]);
 
-  const handle_send = async (user_input: string) => {
-    // FIX 4: single-flight guard — prevents double-submit from StrictMode or
-    // accidental double-click, which caused two DB writes and two UI messages.
-    if (!user_input.trim() || is_streaming || is_submitting.current) return;
-    is_submitting.current = true;
-    set_error_message(null);
+  // ============================================================================
+  // Send message (core logic)
+  // ============================================================================
+  
+  const generate_assistant_response = useCallback(
+    async (
+      conv_id: string,
+      user_msg_id: string,
+      ai_messages: { role: 'user' | 'assistant'; content: string }[]
+    ) => {
+      try {
+        set_streaming(true);
+        set_streaming_content('');
+        start_status_cycling();
 
-    abort_controller_ref.current?.abort();
-    abort_controller_ref.current = new AbortController();
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: ai_messages,
+            location_context: session.location_context,
+          }),
+          signal: abort_controller_ref.current?.signal,
+        });
 
-    let conv_id = active_conversation_id;
-
-    try {
-      // First message → create conversation
-      if (!conv_id) {
-        conv_id = await on_first_message(user_input);
-        // Redirect immediately after creating conversation (ChatGPT pattern)
-        if (window.location.pathname === '/chat') {
-          router.push(`/chat/${conv_id}`);
+        if (!response.ok) {
+          throw new Error(`API error ${response.status}`);
         }
+
+        if (!response.body) throw new Error('No response body');
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let full_response = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          full_response += chunk;
+          set_streaming_content(full_response);
+        }
+
+        // Save assistant response
+        await add_message(conv_id, 'assistant', full_response, user_msg_id);
+        set_streaming_content('');
+        
+        // TTS
+        if (tts_enabled && full_response) speak(strip_suggested_question(full_response));
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          console.log('[chat] Canceled');
+        } else {
+          console.error('[chat]', err);
+          set_error_msg(err instanceof Error ? err.message : 'Error occurred');
+        }
+      } finally {
+        stop_status_cycling();
+        set_streaming(false);
+        is_submitting.current = false;
       }
+    },
+    [session, start_status_cycling, stop_status_cycling, add_message, speak, tts_enabled]
+  );
 
-      // FIX 1: snapshot history BEFORE appending so we don't double-count the
-      // user turn. Previously, if the context updated synchronously inside
-      // append_message the spread below would already contain user_input,
-      // producing a duplicate in ai_messages (and two rows in the DB when
-      // StrictMode fired handle_send twice).
-      const history_snapshot = history_messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
-
-      // Save user message to DB / context
-      await append_message(conv_id, 'user', user_input);
-
-      // Build message array for the AI: snapshot + new user turn
-      const ai_messages = [
-        ...history_snapshot,
-        { role: 'user' as const, content: user_input },
-      ];
-
-      // Stream AI response
-      set_streaming(true);
-      set_streaming_content('');
-      start_status_cycling();
-
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: ai_messages,
-          location_context: session.location_context,
-        }),
-        signal: abort_controller_ref.current.signal,
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error ${response.status}: ${response.statusText}`);
-      }
-
-      if (!response.body) throw new Error('No response body from /api/chat');
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let full_response = '';
-
-      // Stream chunks into state so the UI renders progressively
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        full_response += chunk;
-        set_streaming_content(full_response);
-      }
-
-      // Persist completed assistant message
-      await append_message(conv_id, 'assistant', full_response);
-      set_streaming_content('');
+  const send_message = useCallback(
+    async (user_input: string, parent_id?: string | null) => {
+      if (!user_input.trim() || is_streaming || is_submitting.current) return;
       
-      // TTS: speak response if enabled
-      if (full_response) speak(full_response);
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
-        console.log('[chat] Stream canceled by user');
-      } else {
-        console.error('[chat] Error:', err);
-        // FIX 5: show the error in the UI instead of silently swallowing it
-        set_error_message(
-          err instanceof Error ? err.message : 'Something went wrong. Please try again.'
-        );
-      }
-    } finally {
-      stop_status_cycling();
-      set_streaming(false);
-      // Release the guard so subsequent messages can be sent
-      is_submitting.current = false;
-    }
-  };
+      is_submitting.current = true;
+      set_error_msg(null);
 
-  const handle_cancel = () => {
+      abort_controller_ref.current?.abort();
+      abort_controller_ref.current = new AbortController();
+
+      let conv_id = active_conversation_id;
+
+      try {
+        // Create conversation if first message
+        if (!conv_id) {
+          conv_id = await create_first_message(user_input);
+          if (window.location.pathname === '/chat') {
+            window.history.replaceState(null, '', `/chat/${conv_id}`);
+          }
+        }
+
+        // Save user message
+        const user_msg_id = await add_message(conv_id, 'user', user_input, parent_id);
+        last_user_msg_id_ref.current = user_msg_id;
+
+        // Build AI context
+        let context_messages = messages;
+        if (parent_id !== undefined) {
+          if (parent_id === null) {
+            context_messages = [];
+          } else {
+            const parent_index = messages.findIndex(m => m.id === parent_id);
+            if (parent_index !== -1) {
+              context_messages = messages.slice(0, parent_index + 1);
+            } else {
+              context_messages = [];
+            }
+          }
+        }
+
+        const ai_messages = context_messages.map(m => ({ 
+          role: m.role, 
+          content: strip_suggested_question(m.content)
+        }));
+        
+        ai_messages.push({ role: 'user', content: user_input });
+
+        await generate_assistant_response(conv_id, user_msg_id, ai_messages);
+      } catch (err) {
+        console.error('[chat] Send error', err);
+        set_error_msg('Failed to send message');
+        is_submitting.current = false;
+      }
+    },
+    [
+      active_conversation_id,
+      is_streaming,
+      messages,
+      create_first_message,
+      add_message,
+      router,
+      generate_assistant_response,
+    ]
+  );
+
+  // ============================================================================
+  // User actions
+  // ============================================================================
+  
+  const handle_cancel = useCallback(() => {
     abort_controller_ref.current?.abort();
     stop_status_cycling();
     set_streaming(false);
     set_streaming_content('');
     is_submitting.current = false;
-  };
+  }, [stop_status_cycling]);
 
-  const is_empty = history_messages.length === 0 && !streaming_content && !is_streaming;
+  const handle_edit = useCallback(
+    async (message_id: string, new_content: string) => {
+      const parent_id = await edit_message(message_id);
+      await send_message(new_content, parent_id);
+    },
+    [edit_message, send_message]
+  );
 
-  // Combine persisted history with the live streaming bubble
+  const handle_regenerate = useCallback(
+    async (user_message_id: string) => {
+      if (is_streaming || is_submitting.current) return;
+      
+      const msg_index = messages.findIndex(m => m.id === user_message_id);
+      if (msg_index === -1) return;
+      const msg = messages[msg_index];
+      if (msg.role !== 'user') return;
+
+      is_submitting.current = true;
+      set_error_msg(null);
+
+      abort_controller_ref.current?.abort();
+      abort_controller_ref.current = new AbortController();
+
+      try {
+        await regenerate(user_message_id);
+        
+        const ai_messages = messages.slice(0, msg_index + 1).map(m => ({ 
+          role: m.role, 
+          content: strip_suggested_question(m.content)
+        }));
+
+        await generate_assistant_response(active_conversation_id!, user_message_id, ai_messages);
+      } catch (err) {
+        console.error('[chat] Regenerate error', err);
+        set_error_msg('Failed to regenerate response');
+        is_submitting.current = false;
+      }
+    },
+    [messages, regenerate, active_conversation_id, generate_assistant_response, is_streaming]
+  );
+
+  const handle_sibling_nav = useCallback(
+    async (message_id: string, direction: 'prev' | 'next') => {
+      await navigate_sibling(message_id, direction);
+    },
+    [navigate_sibling]
+  );
+
+  // ============================================================================
+  // Display messages
+  // ============================================================================
+  
   const display_messages = [
-    ...history_messages,
+    ...messages,
     ...(is_streaming
       ? [
           {
@@ -202,36 +283,33 @@ function ChatWindow() {
             role: 'assistant' as const,
             content: streaming_content,
             created_at: new Date().toISOString(),
-            status: 'streaming' as const,
+            sibling_index: 0,
+            sibling_count: 1,
+            siblings: [],
           },
         ]
       : []),
   ];
 
+  const is_empty = messages.length === 0 && !streaming_content && !is_streaming;
+
+  // ============================================================================
+  // Render
+  // ============================================================================
+  
   return (
-    <div
-      className="flex flex-col h-full bg-[#FDFAF4]"
-      role="main"
-      aria-label="Chat with Elora"
-    >
-      {/* Messages area */}
-      <div
-        ref={scroll_ref}
-        className="flex-1 overflow-y-auto py-4"
-        role="list"
-        aria-live="polite"
-        aria-label="Conversation"
-      >
-        {/* Loading history spinner */}
-        {is_loading_history && (
+    <div className="flex flex-col h-full bg-[#FDFAF4]">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto py-4" role="list">
+        {is_loading && (
           <div className="flex justify-center py-8">
             <Loader2 size={20} className="animate-spin text-[#2D5016]" />
           </div>
         )}
 
-        {/* Welcome state */}
+        {/* Welcome */}
         <AnimatePresence>
-          {is_empty && !is_loading_history && (
+          {is_empty && !is_loading && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -241,10 +319,9 @@ function ChatWindow() {
               <motion.div
                 animate={{ scale: [1, 1.04, 1] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                className="w-20 h-20 rounded-full bg-linear-to-br from-[#2D5016] to-[#3d6b1f] flex items-center justify-center shadow-lg mb-5"
-                aria-hidden="true"
+                className="w-20 h-20 rounded-full bg-gradient-to-br from-[#2D5016] to-[#3d6b1f] flex items-center justify-center shadow-lg mb-5"
               >
-                <span className="text-3xl font-serif font-bold text-white select-none">E</span>
+                <span className="text-3xl font-serif font-bold text-white">E</span>
               </motion.div>
 
               <h1 className="font-serif text-2xl font-bold text-[#2D5016] mb-2">
@@ -254,7 +331,7 @@ function ChatWindow() {
                 Your trusted civic companion. Ask me anything about elections, voting, and civic processes.
               </p>
               <div className="flex items-center gap-1.5 text-xs text-[#C9A84C] font-medium mt-2">
-                <Sparkles size={13} aria-hidden="true" />
+                <Sparkles size={13} />
                 <span>Powered by Taheri Developers</span>
               </div>
 
@@ -274,52 +351,57 @@ function ChatWindow() {
           )}
         </AnimatePresence>
 
-        {/* FIX 5: Inline error banner */}
-        {error_message && (
+        {/* Error */}
+        {error_msg && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             className="mx-4 my-2 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-            role="alert"
           >
-            <AlertCircle size={15} className="shrink-0" aria-hidden="true" />
-            <span>{error_message}</span>
+            <AlertCircle size={15} className="shrink-0" />
+            <span>{error_msg}</span>
           </motion.div>
         )}
 
         {/* Messages */}
-        {!is_loading_history &&
-          display_messages.map((message, index) => (
-            <ChatMessage
-              key={message.id}
-              message={{
-                id: message.id,
-                role: message.role,
-                content: message.content,
-                timestamp: new Date(message.created_at),
-                status: message.id === 'streaming' ? 'streaming' : 'complete',
-              }}
-              is_last={index === display_messages.length - 1}
-              on_suggested_question={handle_send}
-              on_edit={() => {
-                console.log('Edit not implemented yet');
-              }}
-              on_rerun={() => {
-                console.log('Rerun not implemented yet');
-              }}
-              on_copy={async (content) => {
-                await navigator.clipboard.writeText(content);
-              }}
-            />
-          ))}
+        {!is_loading &&
+          display_messages.map((msg, index) => {
+            const suggested = extract_suggested_question(msg.content);
+            const clean_content = strip_suggested_question(msg.content);
 
-        <div ref={bottom_ref} aria-hidden="true" />
+            return (
+              <ChatMessage
+                key={msg.id}
+                message={{
+                  id: msg.id,
+                  role: msg.role,
+                  content: clean_content,
+                  timestamp: new Date(msg.created_at),
+                  status: msg.id === 'streaming' ? 'streaming' : 'complete',
+                  suggested_questions: suggested.length > 0 ? suggested : undefined,
+                }}
+                is_last={index === display_messages.length - 1}
+                on_suggested_question={send_message}
+                on_edit={handle_edit}
+                on_rerun={handle_regenerate}
+                on_copy={async (content) => {
+                  await navigator.clipboard.writeText(content);
+                }}
+                on_prev_sibling={() => handle_sibling_nav(msg.id, 'prev')}
+                on_next_sibling={() => handle_sibling_nav(msg.id, 'next')}
+                sibling_index={msg.sibling_index}
+                sibling_count={msg.sibling_count}
+              />
+            );
+          })}
+
+        <div ref={bottom_ref} />
       </div>
 
-      {/* Input area */}
+      {/* Input */}
       <div className="shrink-0 border-t border-[#E7E0D0] bg-[#FDFAF4] px-4 py-3">
         <ChatInput
-          on_send={handle_send}
+          on_send={send_message}
           is_loading={is_streaming}
           on_cancel={handle_cancel}
         />
