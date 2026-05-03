@@ -33,7 +33,7 @@ function waveform_animation() {
   );
 }
 
-export function voice_button({ on_transcript, class_name }: voice_button_props) {
+export function VoiceButton({ on_transcript, class_name }: voice_button_props) {
   const { voice_state, voice_mode } = use_chat_store();
   const { is_supported, start_listening, stop_listening } = use_voice(on_transcript);
 

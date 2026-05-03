@@ -4,6 +4,7 @@
  */
 
 import { supabase_client } from '@/lib/supabase_client';
+import { GOOGLE_OAUTH_REDIRECT_PATH } from '@/lib/constants';
 import type { auth_credentials, registration_data, user_profile } from '@/types/auth_types';
 
 /**
@@ -141,4 +142,25 @@ export async function sign_in_anonymously(): Promise<user_profile> {
     created_at: data.user.created_at,
     updated_at: data.user.updated_at || data.user.created_at,
   };
+}
+
+/**
+ * Sign in with Google OAuth
+ * @returns {Promise<void>} Redirects to Google OAuth flow
+ */
+export async function sign_in_with_google(): Promise<void> {
+  const { error } = await supabase_client.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }

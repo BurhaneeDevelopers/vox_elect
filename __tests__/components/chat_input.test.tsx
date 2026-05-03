@@ -3,7 +3,7 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { chat_input as ChatInput } from '@/components/chat/chat_input';
+import { ChatInput as ChatInput } from '@/components/chat/chat_input';
 
 // Mock stores and hooks
 jest.mock('@/stores/chat_store', () => ({

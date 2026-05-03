@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { ChatMessage } from './chat_message';
-import { chat_input as ChatInput } from './chat_input';
+import { ChatInput as ChatInput } from './chat_input';
 import { useChatHistory } from '@/context/chat_history_context';
 import { use_chat_store } from '@/stores/chat_store';
 import { use_voice } from '@/hooks/use_voice';

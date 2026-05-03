@@ -7,18 +7,18 @@
 import { useState, useRef, useCallback, KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Send, MapPin, X } from 'lucide-react';
-import { voice_button as VoiceButton } from './voice_button';
+import { VoiceButton } from './voice_button';
 import { use_chat_store } from '@/stores/chat_store';
 import { is_valid_zip_code, sanitise_input, cn } from '@/lib/utils';
 import { MAX_INPUT_LENGTH, QUICK_PROMPTS } from '@/lib/constants';
 
-interface chat_input_props {
+interface ChatInputProps {
   on_send: (message: string) => void;
   is_loading: boolean;
   on_cancel?: () => void;
 }
 
-export function chat_input({ on_send, is_loading, on_cancel }: chat_input_props) {
+export function ChatInput({ on_send, is_loading, on_cancel }: ChatInputProps) {
   const [input_value, set_input_value] = useState('');
   const [show_zip_hint, set_show_zip_hint] = useState(false);
   const textarea_ref = useRef<HTMLTextAreaElement>(null);

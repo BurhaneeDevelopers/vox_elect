@@ -14,6 +14,7 @@ import {
   logout_user,
   register_user,
   sign_in_anonymously,
+  sign_in_with_google,
 } from '@/services/auth_service';
 import { supabase_client } from '@/lib/supabase_client';
 import type { auth_credentials, registration_data, user_profile } from '@/types/auth_types';
@@ -105,6 +106,16 @@ export function use_anonymous_signin() {
 }
 
 /**
+ * Hook for Google OAuth sign-in
+ */
+export function use_google_signin() {
+  return useMutation({
+    mutationFn: sign_in_with_google,
+    // OAuth redirects automatically, no onSuccess needed
+  });
+}
+
+/**
  * Hook to listen to auth state changes
  */
 export function use_auth_listener() {
@@ -145,6 +156,7 @@ export function use_auth() {
   const register_mutation = use_register();
   const logout_mutation = use_logout();
   const anonymous_signin_mutation = use_anonymous_signin();
+  const google_signin_mutation = use_google_signin();
 
   // Listen to auth state changes
   use_auth_listener();
@@ -158,12 +170,15 @@ export function use_auth() {
     register: register_mutation.mutate,
     logout: logout_mutation.mutate,
     sign_in_anonymously: anonymous_signin_mutation.mutate,
+    sign_in_with_google: google_signin_mutation.mutate,
     is_logging_in: login_mutation.isPending,
     is_registering: register_mutation.isPending,
     is_logging_out: logout_mutation.isPending,
     is_signing_in_anonymously: anonymous_signin_mutation.isPending,
+    is_signing_in_with_google: google_signin_mutation.isPending,
     login_error: login_mutation.error,
     register_error: register_mutation.error,
     anonymous_signin_error: anonymous_signin_mutation.error,
+    google_signin_error: google_signin_mutation.error,
   };
 }
